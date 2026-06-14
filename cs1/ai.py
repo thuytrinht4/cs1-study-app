@@ -164,3 +164,53 @@ def find_weak_patterns(answers: list[dict], open_patterns: list[dict], topic_nam
         if getattr(block, "type", None) == "tool_use":
             return dict(block.input)
     raise RuntimeError("Claude did not return structured patterns.")
+
+
+# ====================================================================
+#  Generate a fresh exam-style question on demand (Sonnet)
+# ====================================================================
+GENERATE_TOOL = {
+    "name": "report_question",
+    "description": "Produce one original, exam-style CS1 question with a worked model answer and mark scheme.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "topic": {"type": "string", "description": "short topic label, e.g. '4.2 GLMs'"},
+            "module": {"type": "integer", "description": "1 Data analysis, 2 Probability, 3 Inference, 4 Regression/GLM, 5 Bayesian"},
+            "type": {"type": "string", "enum": ["concept", "formula", "r"]},
+            "front": {"type": "string", "description": "the question, multi-part with marks shown as **[n]**, past-paper style"},
+            "model_answer": {"type": "string", "description": "worked solution; begin with '**Approach:**' (the method) then '**Solution:**'"},
+            "mark_scheme": {"type": "array", "items": {"type": "object", "properties": {
+                "point": {"type": "string"}, "marks": {"type": "integer"}}, "required": ["point", "marks"]}},
+            "max_marks": {"type": "integer", "description": "must equal the sum of the mark-scheme marks"},
+        },
+        "required": ["topic", "module", "type", "front", "model_answer", "mark_scheme", "max_marks"],
+    },
+}
+
+GENERATE_SYSTEM = (
+    "You are an IFoA CS1 (Actuarial Statistics) examiner writing original practice questions in the "
+    "style of past papers. Write ONE multi-part, applied question on the requested topic — a realistic "
+    "scenario with parts labelled (i), (ii), … and the marks shown as **[n]**. Provide a fully worked "
+    "model answer that starts with the method/approach, then the solution with clear substitution, and "
+    "ends with interpretation in context. Provide a point-by-point mark scheme whose marks sum exactly "
+    "to max_marks. Use realistic numbers and ensure every calculation is numerically correct. Reward the "
+    "exam style: stating H0/H1, concluding in context, commenting on R output. If the topic is R/CS1B, "
+    "set type='r' and give correct R code in fenced ```r blocks."
+)
+
+
+def generate_exam_question(topic: str) -> dict:
+    """Ask Claude for one new exam-style question dict (matches GENERATE_TOOL)."""
+    msg = _get_client().messages.create(
+        model=config.MODEL_ANALYST,
+        max_tokens=1500,
+        tools=[GENERATE_TOOL],
+        tool_choice={"type": "tool", "name": "report_question"},
+        system=GENERATE_SYSTEM,
+        messages=[{"role": "user", "content": f"Write one exam-style CS1 question on: {topic}."}],
+    )
+    for block in msg.content:
+        if getattr(block, "type", None) == "tool_use":
+            return dict(block.input)
+    raise RuntimeError("Claude did not return a question.")

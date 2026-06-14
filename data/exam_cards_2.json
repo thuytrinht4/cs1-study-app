@@ -1,0 +1,426 @@
+[
+  {
+    "id": "EX-4.2-3",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "An offset is a covariate with coefficient fixed at 1 — log(exposure) — so you model the rate. Expected count = rate × exposure.",
+    "front": "A Poisson GLM with log link models claim counts using an **offset** of log(exposure). For urban policies the fitted model gives η = −2.0 + 0.4·urban + log(exposure), where urban = 1.\n\n(i) Explain what an offset is and why it is used here. **[2]**\n(ii) Calculate the expected number of claims for an urban group with exposure 500 policy-years. **[3]**\n(iii) Interpret the coefficient 0.4. **[1]**",
+    "model_answer": "**Approach:** An offset is a term in the linear predictor with a known coefficient fixed at 1, used to model a *rate* per unit exposure. Expected count = rate × exposure, rate = exp(linear part excluding the offset).\n\n**Solution:**\n(i) An offset is a covariate (here log(exposure)) whose coefficient is fixed at 1, not estimated. It lets us model the claim **rate** per policy-year while the response is a count: log(μ) = log(exposure) + β·x, i.e. μ = exposure × exp(β·x).\n(ii) Rate per policy-year = exp(−2.0 + 0.4·1) = exp(−1.6) = 0.2019. Expected claims = rate × exposure = 0.2019 × 500 = 100.9 ≈ 101.\n(iii) exp(0.4) = 1.49: urban policies have about 1.49 times the claim **rate** of non-urban policies (a 49% higher rate).",
+    "mark_scheme": [
+      {"point": "Offset = covariate with coefficient fixed at 1 (log exposure)", "marks": 1},
+      {"point": "Used to model a rate per unit exposure", "marks": 1},
+      {"point": "Rate = exp(−1.6) = 0.2019", "marks": 2},
+      {"point": "Expected claims = 0.2019 × 500 ≈ 101", "marks": 1},
+      {"point": "exp(0.4) = 1.49 interpreted as rate ratio", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.2-4",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Gamma suits positive, right-skewed claim sizes. A log link gives multiplicative, positive fitted means; exp(β) is a multiplicative effect.",
+    "front": "Claim severities (amounts) are modelled with a Gamma GLM using a log link. The fitted linear predictor is η = 6.0 + 0.20·x, where x is a risk indicator.\n\n(i) Give one reason a Gamma distribution is suitable for claim severities. **[1]**\n(ii) State one advantage of a log link over the canonical (inverse) link here. **[1]**\n(iii) Estimate the mean severity for x = 1. **[2]**\n(iv) Interpret the coefficient 0.20. **[1]**\n(v) State how you would compare two competing Gamma GLMs. **[1]**",
+    "model_answer": "**Approach:** Gamma = positive, right-skewed → claim sizes. Log link ⇒ μ = exp(η) > 0 and multiplicative covariate effects. Compare nested models by scaled deviance (χ²), or any models by AIC.\n\n**Solution:**\n(i) Claim severities are continuous, strictly positive and right-skewed, which the Gamma distribution captures (the Normal would allow negative values).\n(ii) The log link guarantees a positive fitted mean and gives multiplicative (interpretable) effects; the inverse link can produce awkward/negative fitted values.\n(iii) η = 6.0 + 0.20·1 = 6.20, so mean severity μ = e^6.20 = 492.7.\n(iv) exp(0.20) = 1.22: risk group x = 1 has about 1.22 times (22% higher) mean severity than the baseline.\n(v) Compare by AIC (lower is better) or, for nested models, by the change in scaled deviance against a χ² distribution.",
+    "mark_scheme": [
+      {"point": "Gamma = positive, right-skewed severities", "marks": 1},
+      {"point": "Log link keeps μ > 0 / multiplicative", "marks": 1},
+      {"point": "η = 6.20 and μ = e^6.20 = 492.7", "marks": 2},
+      {"point": "exp(0.20) = 1.22 interpreted multiplicatively", "marks": 1},
+      {"point": "Compare via AIC / scaled deviance", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.2-5",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Deviance measures fit relative to the saturated model. Nested models: ΔD ~ χ² on Δparameters. AIC for non-nested.",
+    "front": "A GLM is assessed using its deviance.\n\n(i) Define the deviance of a fitted GLM. **[2]**\n(ii) State the approximate distribution of the scaled deviance and its degrees of freedom for a model with n observations and p parameters. **[1]**\n(iii) Two **nested** models have deviances 60.4 (df 30) and 52.1 (df 27). Test whether the larger model is justified at the 5% level. **[2]**\n(iv) State when you would use AIC rather than a deviance difference. **[1]**",
+    "model_answer": "**Approach:** Deviance = 2·(log-lik of saturated model − log-lik of fitted model). Nested comparison: ΔDeviance ~ χ² on the difference in parameters. AIC compares non-nested models.\n\n**Solution:**\n(i) The deviance is 2×(maximised log-likelihood of the saturated model − maximised log-likelihood of the fitted model). It measures how far the fitted model is from a perfect (saturated) fit — smaller is better.\n(ii) The scaled deviance is approximately χ² with n − p degrees of freedom.\n(iii) ΔDeviance = 60.4 − 52.1 = 8.3 on 30 − 27 = 3 df. Compare with χ²₀.₀₅,₃ = 7.815. Since 8.3 > 7.815, the reduction is significant: the larger model is justified.\n(iv) Use AIC when the models are **not nested** (or to penalise extra parameters generally); AIC = −2·log-lik + 2p, lower is better.",
+    "mark_scheme": [
+      {"point": "Deviance = 2(ℓ_saturated − ℓ_fitted)", "marks": 2},
+      {"point": "Scaled deviance ~ χ² on n − p df", "marks": 1},
+      {"point": "ΔD = 8.3 on 3 df > 7.815 ⇒ larger model justified", "marks": 2},
+      {"point": "AIC for non-nested models", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.2-6",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Logistic: π = e^η/(1+e^η); exp(β) is an odds ratio. For a c-unit change the odds ratio is exp(cβ).",
+    "front": "A logistic regression for the probability of a claim has fitted log-odds logit(π) = −1.5 + 0.7·smoker + 0.03·age.\n\n(i) Calculate the claim probability for a smoker aged 50. **[3]**\n(ii) Interpret the smoker coefficient as an odds ratio. **[2]**\n(iii) Calculate and interpret the odds ratio for a 10-year increase in age. **[2]**",
+    "model_answer": "**Approach:** Inverse logit π = e^η/(1+e^η). exp(β) is the odds ratio for a 1-unit change; for a c-unit change use exp(cβ).\n\n**Solution:**\n(i) η = −1.5 + 0.7·1 + 0.03·50 = −1.5 + 0.7 + 1.5 = 0.7. π = e^0.7/(1+e^0.7) = 2.014/3.014 = 0.668.\n(ii) exp(0.7) = 2.01: smokers have about 2.01 times the **odds** of a claim compared with non-smokers, holding age fixed.\n(iii) For +10 years, odds ratio = exp(0.03·10) = exp(0.3) = 1.35: each extra 10 years of age multiplies the odds of a claim by about 1.35 (a 35% increase in the odds).",
+    "mark_scheme": [
+      {"point": "η = 0.7", "marks": 1},
+      {"point": "π = 0.668", "marks": 2},
+      {"point": "exp(0.7) = 2.01 interpreted as odds ratio", "marks": 2},
+      {"point": "exp(0.3) = 1.35 for 10-year change, interpreted", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-4.2-7",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "A factor with k levels uses k−1 dummy variables; one level is the baseline. Each coefficient is relative to that baseline.",
+    "front": "In a Poisson GLM with log link, a vehicle-group factor has three levels (A, B, C). Fitting gives η = −1.0 + 0.3·(group B) + 0.5·(group C), with group A as the baseline.\n\n(i) Explain how a 3-level factor is represented in the model. **[2]**\n(ii) Interpret the coefficient 0.5. **[2]**\n(iii) Calculate the ratio of the expected claim rate for group C to group B. **[2]**",
+    "model_answer": "**Approach:** A k-level factor uses k−1 dummy (indicator) variables; the omitted level is the baseline. With a log link each coefficient is a log rate-ratio relative to the baseline; rate ratios multiply.\n\n**Solution:**\n(i) The factor is coded with k − 1 = 2 dummy variables (group B and group C indicators); group A is the baseline (both dummies 0). Each coefficient measures the effect of that level relative to A.\n(ii) exp(0.5) = 1.65: group C has about 1.65 times the claim rate of the baseline group A.\n(iii) Rate ratio C : B = exp(0.5)/exp(0.3) = exp(0.5 − 0.3) = exp(0.2) = 1.22. Group C's expected claim rate is about 1.22 times group B's.",
+    "mark_scheme": [
+      {"point": "k − 1 = 2 dummy variables", "marks": 1},
+      {"point": "One level (A) is the baseline", "marks": 1},
+      {"point": "exp(0.5) = 1.65 vs baseline A", "marks": 2},
+      {"point": "C:B ratio = exp(0.2) = 1.22", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-4.1-2",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Overall F-test: F = (R²/p)/((1−R²)/(n−p−1)) on (p, n−p−1). Adjusted R² penalises extra predictors.",
+    "front": "A multiple linear regression with p = 3 predictors fitted to n = 50 observations has R² = 0.65.\n\n(i) Interpret a single estimated (partial) slope coefficient in a multiple regression. **[1]**\n(ii) Calculate the adjusted R² and explain why it is used. **[2]**\n(iii) Test whether the regression is significant overall at the 5% level. **[3]**",
+    "model_answer": "**Approach:** Partial slope = effect of one predictor holding the others fixed. Adjusted R² penalises added predictors. Overall significance: F = (R²/p)/((1−R²)/(n−p−1)).\n\n**Solution:**\n(i) Each partial slope estimates the change in the mean response for a one-unit increase in that predictor, **holding the other predictors constant**.\n(ii) Adjusted R² = 1 − (1−R²)(n−1)/(n−p−1) = 1 − 0.35·(49/46) = 1 − 0.3728 = 0.627. It is used because ordinary R² never decreases when predictors are added; the adjustment penalises extra parameters, allowing fair model comparison.\n(iii) H₀: all slopes = 0. F = (R²/p)/((1−R²)/(n−p−1)) = (0.65/3)/(0.35/46) = 0.2167/0.007609 = 28.5 on (3, 46) df. F₀.₀₅,₃,₄₆ ≈ 2.81; since 28.5 > 2.81, reject H₀: the regression is highly significant overall.",
+    "mark_scheme": [
+      {"point": "Partial slope: effect holding others constant", "marks": 1},
+      {"point": "Adjusted R² = 0.627", "marks": 1},
+      {"point": "Reason: penalises added predictors", "marks": 1},
+      {"point": "F = 28.5 on (3, 46)", "marks": 2},
+      {"point": "Compare to ≈2.81, conclude significant", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.3-1",
+    "topic": "4.3 Correlation",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Test ρ = 0 with t = r√(n−2)/√(1−r²) on n−2 df. Correlation ≠ causation.",
+    "front": "A sample of n = 20 paired observations has Pearson correlation r = 0.60.\n\n(i) State the hypotheses for testing whether the population correlation is zero. **[1]**\n(ii) Carry out the test at the 5% level. **[3]**\n(iii) State your conclusion. **[1]**\n(iv) State one limitation of interpreting this result. **[1]**",
+    "model_answer": "**Approach:** Test H₀: ρ = 0 using t = r√(n−2)/√(1−r²) ~ t_{n−2}. Remember correlation does not imply causation.\n\n**Solution:**\n(i) H₀: ρ = 0 vs H₁: ρ ≠ 0.\n(ii) t = r√(n−2)/√(1−r²) = 0.60·√18/√(1−0.36) = 0.60·4.243/0.8 = 2.546/0.8 = 3.18 on 18 df. Critical value t₀.₀₂₅,₁₈ = 2.101.\n(iii) Since 3.18 > 2.101, reject H₀: there is significant evidence at the 5% level of a non-zero correlation.\n(iv) A significant correlation does not imply a causal relationship; it may be driven by a confounding variable, and Pearson's r only measures **linear** association.",
+    "mark_scheme": [
+      {"point": "Hypotheses H₀: ρ = 0", "marks": 1},
+      {"point": "Test statistic t = 3.18", "marks": 2},
+      {"point": "df = 18 and critical value 2.101", "marks": 1},
+      {"point": "Conclusion: reject, significant correlation", "marks": 1},
+      {"point": "Correlation ≠ causation / linear only", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.1-3",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Complete the ANOVA table: df, MS = SS/df, F = MSR/MSE. R² = SSR/SST.",
+    "front": "For a simple linear regression on n = 12 observations, the total sum of squares is SST = 200 and the regression sum of squares is SSR = 150.\n\n(i) Complete the analysis-of-variance table (sums of squares, degrees of freedom, mean squares). **[3]**\n(ii) Test the significance of the regression at the 5% level. **[2]**\n(iii) Calculate R². **[1]**",
+    "model_answer": "**Approach:** SSE = SST − SSR. df: regression = 1, residual = n − 2, total = n − 1. MS = SS/df, F = MSR/MSE. R² = SSR/SST.\n\n**Solution:**\n(i) SSE = 200 − 150 = 50.\n| Source | SS | df | MS |\n|---|---|---|---|\n| Regression | 150 | 1 | 150 |\n| Residual | 50 | 10 | 5 |\n| Total | 200 | 11 | |\n(ii) F = MSR/MSE = 150/5 = 30 on (1, 10) df. F₀.₀₅,₁,₁₀ = 4.96; since 30 > 4.96, the regression is significant at the 5% level.\n(iii) R² = SSR/SST = 150/200 = 0.75 (75% of variation explained).",
+    "mark_scheme": [
+      {"point": "SSE = 50", "marks": 1},
+      {"point": "Correct df (1, 10, 11)", "marks": 1},
+      {"point": "MS: 150 and 5", "marks": 1},
+      {"point": "F = 30 vs 4.96", "marks": 2},
+      {"point": "R² = 0.75", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.1-4",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Check assumptions with residual plots: residuals vs fitted (linearity, equal variance), Q-Q plot (Normality). A funnel = heteroscedasticity.",
+    "front": "After fitting a linear regression you check the model assumptions using residual diagnostics.\n\n(i) State which plot you would use to check (a) linearity and equal variance, and (b) Normality of the errors. **[3]**\n(ii) What does a funnel (fanning-out) shape in the residuals-vs-fitted plot indicate? **[1]**\n(iii) Suggest one remedy. **[1]**",
+    "model_answer": "**Approach:** Map each 'LINE' assumption to its diagnostic plot; a funnel indicates non-constant variance, often fixed by transforming the response.\n\n**Solution:**\n(i) (a) A plot of residuals against fitted values checks linearity (no systematic curvature) and equal variance (constant spread). (b) A Normal Q-Q plot of the residuals checks Normality (points should lie on the line).\n(ii) A funnel/fanning shape indicates heteroscedasticity — the error variance is not constant (it increases or decreases with the fitted value).\n(iii) Apply a variance-stabilising transformation of the response (e.g. log or square-root), or use weighted least squares / a GLM with a suitable variance function.",
+    "mark_scheme": [
+      {"point": "Residuals vs fitted for linearity/equal variance", "marks": 2},
+      {"point": "Q-Q plot for Normality", "marks": 1},
+      {"point": "Funnel = heteroscedasticity (non-constant variance)", "marks": 1},
+      {"point": "Remedy: transform response / WLS / GLM", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.3-3",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Paired data → work with the differences; one-sample t on d̄. t = d̄/(s_d/√n).",
+    "front": "A training course is assessed by testing 10 employees before and after. The differences (after − before) have mean d̄ = 5 and standard deviation s_d = 8.\n\n(i) Explain why a paired test is appropriate. **[1]**\n(ii) State suitable hypotheses to test whether the course improves scores. **[1]**\n(iii) Carry out the test at the 5% level. **[2]**\n(iv) State your conclusion in context. **[2]**",
+    "model_answer": "**Approach:** Paired/matched data → analyse the within-pair differences with a one-sample t-test. One-sided test for an improvement: t = d̄/(s_d/√n) on n−1 df.\n\n**Solution:**\n(i) The before and after measurements are on the **same** employees, so the two samples are dependent (paired); analysing differences removes between-person variation.\n(ii) H₀: μ_d = 0 vs H₁: μ_d > 0 (one-sided — the course improves scores).\n(iii) t = d̄/(s_d/√n) = 5/(8/√10) = 5/2.530 = 1.98 on 9 df. One-sided critical value t₀.₀₅,₉ = 1.833.\n(iv) Since 1.98 > 1.833, reject H₀: there is significant evidence at the 5% level that the course improves scores on average.",
+    "mark_scheme": [
+      {"point": "Paired because same subjects / dependent", "marks": 1},
+      {"point": "One-sided hypotheses on μ_d", "marks": 1},
+      {"point": "t = 1.98 on 9 df", "marks": 2},
+      {"point": "Critical value 1.833", "marks": 1},
+      {"point": "Conclusion in context (reject)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.3-4",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "F-test for equal variances: F = larger s²/smaller s² on (df_large, df_small). Needed to justify a pooled t-test.",
+    "front": "Two samples have variances s₁² = 50 (n₁ = 10) and s₂² = 20 (n₂ = 13).\n\n(i) State the hypotheses for testing equality of the two population variances. **[1]**\n(ii) Carry out the F-test at the 5% level. **[3]**\n(iii) Explain why this test is relevant before performing a pooled two-sample t-test. **[2]**",
+    "model_answer": "**Approach:** F = (larger sample variance)/(smaller) ~ F with (df of numerator, df of denominator). Two-sided 5% uses the upper 2.5% point.\n\n**Solution:**\n(i) H₀: σ₁² = σ₂² vs H₁: σ₁² ≠ σ₂².\n(ii) F = s₁²/s₂² = 50/20 = 2.5 on (n₁−1, n₂−1) = (9, 12) df. Two-sided 5% critical value F₀.₀₂₅,₉,₁₂ ≈ 3.44. Since 2.5 < 3.44, do not reject H₀: no significant evidence that the variances differ.\n(iii) The pooled (equal-variance) two-sample t-test assumes the two population variances are equal; this F-test checks that assumption. If it were rejected, you would use the unequal-variance (Welch) t-test instead.",
+    "mark_scheme": [
+      {"point": "Hypotheses on equality of variances", "marks": 1},
+      {"point": "F = 2.5", "marks": 1},
+      {"point": "df (9, 12) and critical ≈ 3.44", "marks": 1},
+      {"point": "Conclusion: do not reject", "marks": 1},
+      {"point": "Pooled t-test assumes equal variances", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-3.3-5",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Large-sample test of a proportion: z = (p̂ − p₀)/√(p₀(1−p₀)/n).",
+    "front": "In a survey of n = 200 policyholders, 90 say they would renew. Test, at the 5% level, the claim that half of all policyholders would renew.\n\n(i) State the hypotheses. **[1]**\n(ii) Calculate the test statistic. **[3]**\n(iii) State your conclusion. **[1]**\n(iv) State the condition under which the Normal approximation used here is valid. **[1]**",
+    "model_answer": "**Approach:** Large-sample test of a proportion: z = (p̂ − p₀)/√(p₀(1−p₀)/n), compared with standard Normal critical values.\n\n**Solution:**\n(i) H₀: p = 0.5 vs H₁: p ≠ 0.5. Observed p̂ = 90/200 = 0.45.\n(ii) Standard error = √(p₀(1−p₀)/n) = √(0.5·0.5/200) = √0.00125 = 0.03536. z = (0.45 − 0.5)/0.03536 = −1.41.\n(iii) |−1.41| < 1.96, so do not reject H₀: no significant evidence at the 5% level that the renewal proportion differs from one half.\n(iv) The Normal approximation is valid when n is large with np₀ and n(1−p₀) both reasonably large (a common rule is both ≥ 5; here both = 100).",
+    "mark_scheme": [
+      {"point": "Hypotheses and p̂ = 0.45", "marks": 1},
+      {"point": "SE = 0.03536", "marks": 1},
+      {"point": "z = −1.41", "marks": 2},
+      {"point": "Conclusion: do not reject", "marks": 1},
+      {"point": "np₀, n(1−p₀) ≥ 5 (large n)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.3-6",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "One-way ANOVA: F = MSB/MSW = (SSB/(k−1))/(SSW/(N−k)).",
+    "front": "A one-way ANOVA compares mean claim sizes across k = 3 regions using N = 24 observations. The between-groups sum of squares is SSB = 120 and the within-groups sum of squares is SSW = 180.\n\n(i) State the hypotheses. **[1]**\n(ii) State the key assumptions of one-way ANOVA. **[1]**\n(iii) Calculate the F statistic. **[3]**\n(iv) State your conclusion at the 5% level. **[1]**",
+    "model_answer": "**Approach:** One-way ANOVA tests equality of group means via F = MSB/MSW, with df (k−1, N−k).\n\n**Solution:**\n(i) H₀: μ₁ = μ₂ = μ₃ vs H₁: at least one mean differs.\n(ii) Observations are independent, Normally distributed within each group, with a common (equal) variance across groups.\n(iii) MSB = SSB/(k−1) = 120/2 = 60. MSW = SSW/(N−k) = 180/21 = 8.571. F = MSB/MSW = 60/8.571 = 7.0 on (2, 21) df.\n(iv) F₀.₀₅,₂,₂₁ ≈ 3.47; since 7.0 > 3.47, reject H₀: there is significant evidence that mean claim sizes differ between regions.",
+    "mark_scheme": [
+      {"point": "Hypotheses (equal means)", "marks": 1},
+      {"point": "Assumptions: independent, Normal, equal variance", "marks": 1},
+      {"point": "MSB = 60 and MSW = 8.571", "marks": 2},
+      {"point": "F = 7.0 on (2, 21)", "marks": 1},
+      {"point": "Compare 3.47, conclude reject", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.3-7",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Contingency table: expected = (row total × column total)/grand total; df = (r−1)(c−1).",
+    "front": "A 2×2 table records smoking status against whether a critical-illness claim occurred:\n\n| | Claim | No claim | Total |\n|---|---|---|---|\n| Smoker | 30 | 70 | 100 |\n| Non-smoker | 20 | 280 | 300 |\n| Total | 50 | 350 | 400 |\n\nTest, at the 5% level, whether smoking and claiming are associated.\n\n(i) State the hypotheses. **[1]**\n(ii) Calculate the expected frequencies. **[2]**\n(iii) Calculate the chi-square statistic. **[2]**\n(iv) State the degrees of freedom and conclude. **[2]**",
+    "model_answer": "**Approach:** Test of association: expected = row×column/grand total; χ² = Σ(O−E)²/E; df = (r−1)(c−1).\n\n**Solution:**\n(i) H₀: smoking and claiming are independent vs H₁: they are associated.\n(ii) Expected = (row total × column total)/400: Smoker-Claim = 100·50/400 = 12.5; Smoker-NoClaim = 100·350/400 = 87.5; Non-Claim = 300·50/400 = 37.5; Non-NoClaim = 300·350/400 = 262.5.\n(iii) χ² = (30−12.5)²/12.5 + (70−87.5)²/87.5 + (20−37.5)²/37.5 + (280−262.5)²/262.5 = 24.5 + 3.5 + 8.17 + 1.17 = 37.3.\n(iv) df = (2−1)(2−1) = 1; χ²₀.₀₅,₁ = 3.841. Since 37.3 > 3.841, reject H₀: there is strong evidence that smoking and claiming are associated.",
+    "mark_scheme": [
+      {"point": "Hypotheses (independence vs association)", "marks": 1},
+      {"point": "Expected frequencies 12.5, 87.5, 37.5, 262.5", "marks": 2},
+      {"point": "χ² = 37.3", "marks": 2},
+      {"point": "df = 1, critical 3.841", "marks": 1},
+      {"point": "Conclusion: reject, association exists", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-5.1-2",
+    "topic": "5.1 Bayesian statistics",
+    "module": 5,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Gamma prior + Poisson data → Gamma posterior. Posterior of Gamma(α,β) [rate β] has mean α/β.",
+    "front": "The Poisson rate λ of claims has a Gamma(α = 3, β = 2) prior (β is the rate parameter). Over n = 4 periods a total of 8 claims is observed.\n\n(i) Identify the form of the posterior, justifying the conjugacy. **[2]**\n(ii) State the posterior distribution. **[2]**\n(iii) Give the posterior mean (the Bayes estimate under quadratic loss). **[1]**\n(iv) Express the posterior mean as a credibility estimate and find Z. **[2]**",
+    "model_answer": "**Approach:** Gamma prior + Poisson likelihood → Gamma posterior (conjugate). For Gamma(α, β) with β a rate, mean = α/β.\n\n**Solution:**\n(i) Likelihood ∝ λ^(Σx) e^(−nλ); prior ∝ λ^(α−1) e^(−βλ). Product ∝ λ^(α+Σx−1) e^(−(β+n)λ) — a Gamma kernel, so the posterior is Gamma (conjugate).\n(ii) Posterior = Gamma(α + Σx, β + n) = Gamma(3 + 8, 2 + 4) = Gamma(11, 6).\n(iii) Posterior mean = 11/6 = 1.833.\n(iv) Posterior mean = (α + Σx)/(β + n) = Z·(Σx/n) + (1 − Z)·(α/β) with Z = n/(β + n) = 4/6 = 0.667. Check: 0.667·2 + 0.333·1.5 = 1.833 ✓.",
+    "mark_scheme": [
+      {"point": "Multiplies kernels → Gamma / states conjugacy", "marks": 2},
+      {"point": "Posterior Gamma(11, 6)", "marks": 2},
+      {"point": "Posterior mean = 1.833", "marks": 1},
+      {"point": "Credibility form with Z = 0.667", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-5.1-3",
+    "topic": "5.1 Bayesian statistics",
+    "module": 5,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Normal–Normal: posterior precision = prior precision + data precision; posterior mean is a precision-weighted average.",
+    "front": "A mean μ has prior N(100, 25) (i.e. prior variance 25). A sample of n = 10 observations with known variance σ² = 100 gives x̄ = 110.\n\n(i) State why the posterior is Normal. **[1]**\n(ii) Calculate the posterior mean. **[3]**\n(iii) Calculate the posterior variance. **[2]**",
+    "model_answer": "**Approach:** Normal prior + Normal likelihood (known variance) → Normal posterior (conjugate). Work in precisions (1/variance): they add, and the posterior mean is the precision-weighted average.\n\n**Solution:**\n(i) The Normal is conjugate to a Normal likelihood with known variance, so the posterior is Normal.\n(ii) Prior precision = 1/25 = 0.04; data precision = n/σ² = 10/100 = 0.10. Posterior mean = (0.04·100 + 0.10·110)/(0.04 + 0.10) = (4 + 11)/0.14 = 15/0.14 = 107.1.\n(iii) Posterior precision = 0.04 + 0.10 = 0.14, so posterior variance = 1/0.14 = 7.14 (standard deviation 2.67).",
+    "mark_scheme": [
+      {"point": "Normal is conjugate → Normal posterior", "marks": 1},
+      {"point": "Prior precision 0.04 and data precision 0.10", "marks": 1},
+      {"point": "Posterior mean = 107.1", "marks": 2},
+      {"point": "Posterior variance = 7.14", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-5.2-2",
+    "topic": "5.2 Credibility theory",
+    "module": 5,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "EBCT Model 1: k = E[s²(θ)]/Var[m(θ)] = EPV/VHM; Z = n/(n+k).",
+    "front": "Under Empirical Bayes Credibility Theory (Model 1), the expected process variance is EPV = 100 and the variance of the hypothetical means is VHM = 20. A risk has n = 5 years of data with mean x̄ = 250; the overall mean is 200.\n\n(i) Define EPV and VHM in words. **[2]**\n(ii) Calculate the credibility factor Z. **[2]**\n(iii) Calculate the credibility premium. **[2]**",
+    "model_answer": "**Approach:** EBCT1: k = EPV/VHM, Z = n/(n+k); credibility premium = Z·x̄ + (1−Z)·(overall mean).\n\n**Solution:**\n(i) EPV = E[s²(θ)] is the average variability **within** a risk (the mean over risks of the process variance). VHM = Var[m(θ)] is the variability **between** the risks' true mean claim levels.\n(ii) k = EPV/VHM = 100/20 = 5. Z = n/(n + k) = 5/(5 + 5) = 0.5.\n(iii) Credibility premium = Z·x̄ + (1 − Z)·200 = 0.5·250 + 0.5·200 = 125 + 100 = 225.",
+    "mark_scheme": [
+      {"point": "EPV = within-risk variability", "marks": 1},
+      {"point": "VHM = between-risk variability", "marks": 1},
+      {"point": "k = 5", "marks": 1},
+      {"point": "Z = 0.5", "marks": 1},
+      {"point": "Credibility premium = 225", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-3.1-2",
+    "topic": "3.1 Estimation & MLE",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Uniform(0, θ): method of moments uses E[X] = θ/2; MLE is the sample maximum.",
+    "front": "X₁,…,Xₙ are independent Uniform(0, θ).\n\n(i) Derive the method-of-moments estimator of θ. **[2]**\n(ii) Derive the maximum likelihood estimator of θ. **[2]**\n(iii) Comment on the bias of the two estimators. **[2]**",
+    "model_answer": "**Approach:** Method of moments: equate E[X] to x̄. MLE: maximise the likelihood, which for a Uniform(0,θ) is largest at the smallest feasible θ, i.e. the sample maximum.\n\n**Solution:**\n(i) E[X] = θ/2. Setting θ/2 = x̄ gives the MoM estimator θ̂_MoM = 2x̄.\n(ii) Likelihood L(θ) = (1/θ)ⁿ for θ ≥ max(xᵢ) and 0 otherwise. This is decreasing in θ, so it is maximised at the smallest allowable value: θ̂_MLE = max(x₁,…,xₙ).\n(iii) θ̂_MoM is unbiased: E[2x̄] = 2·(θ/2) = θ. θ̂_MLE is biased **downwards** (E[max] = nθ/(n+1) < θ), since the sample maximum can never exceed θ; multiplying by (n+1)/n removes the bias.",
+    "mark_scheme": [
+      {"point": "E[X] = θ/2", "marks": 1},
+      {"point": "MoM estimator 2x̄", "marks": 1},
+      {"point": "Likelihood (1/θ)ⁿ, θ ≥ max", "marks": 1},
+      {"point": "MLE = sample maximum", "marks": 1},
+      {"point": "MoM unbiased; MLE biased low (E[max]=nθ/(n+1))", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-3.1-3",
+    "topic": "3.1 Estimation & MLE",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "MSE = variance + bias². A biased estimator can beat an unbiased one if its variance is much smaller.",
+    "front": "Two estimators of a parameter are proposed. T₁ is unbiased with variance 10. T₂ has bias 1 and variance 6.\n\n(i) State the relationship between mean squared error, variance and bias. **[1]**\n(ii) Calculate the MSE of each estimator. **[2]**\n(iii) State which estimator is preferable on an MSE basis, and what theoretical result bounds the variance of an unbiased estimator. **[2]**",
+    "model_answer": "**Approach:** MSE = Var + bias². Compare MSEs; recall the Cramér–Rao lower bound on the variance of unbiased estimators.\n\n**Solution:**\n(i) MSE(T) = Var(T) + [bias(T)]².\n(ii) MSE(T₁) = 10 + 0² = 10. MSE(T₂) = 6 + 1² = 7.\n(iii) T₂ is preferable on an MSE basis (7 < 10): a small bias is more than offset by the lower variance. The variance of any unbiased estimator is bounded below by the **Cramér–Rao lower bound**, 1/I(θ); an unbiased estimator achieving it is efficient.",
+    "mark_scheme": [
+      {"point": "MSE = Var + bias²", "marks": 1},
+      {"point": "MSE(T₁) = 10", "marks": 1},
+      {"point": "MSE(T₂) = 7", "marks": 1},
+      {"point": "T₂ preferred (lower MSE)", "marks": 1},
+      {"point": "Cramér–Rao lower bound 1/I(θ)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.2-1",
+    "topic": "2.2 Conditional expectation & sums",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Aggregate claims S = ΣXᵢ, N ~ Poisson(λ): E[S] = λ·E[X], Var[S] = λ·E[X²] = λ(σ² + μ²).",
+    "front": "Aggregate annual claims are S = X₁ + … + X_N, where N ~ Poisson(λ = 100) and the claim sizes Xᵢ are independent of N with mean 500 and standard deviation 300.\n\n(i) Calculate E[S]. **[1]**\n(ii) Calculate Var[S]. **[3]**\n(iii) Using a Normal approximation, estimate P(S > 60000). **[2]**",
+    "model_answer": "**Approach:** For a compound Poisson, E[S] = λ·E[X] and Var[S] = λ·E[X²] = λ(σ² + μ²) (from the laws of total expectation and variance). Then Normal-approximate S.\n\n**Solution:**\n(i) E[S] = λ·E[X] = 100·500 = 50000.\n(ii) E[X²] = σ² + μ² = 300² + 500² = 90000 + 250000 = 340000. Var[S] = λ·E[X²] = 100·340000 = 34,000,000, so SD(S) = √34,000,000 = 5831.\n(iii) S ≈ Normal(50000, 5831²). P(S > 60000) ≈ P(Z > (60000 − 50000)/5831) = P(Z > 1.715) = 1 − 0.9568 = 0.043.",
+    "mark_scheme": [
+      {"point": "E[S] = λ·E[X] = 50000", "marks": 1},
+      {"point": "E[X²] = σ² + μ² = 340000", "marks": 1},
+      {"point": "Var[S] = λ·E[X²] = 34,000,000", "marks": 2},
+      {"point": "Standardise: Z = 1.715", "marks": 1},
+      {"point": "P ≈ 0.043", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.3-1",
+    "topic": "2.3 Central Limit Theorem",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "By the CLT, x̄ ≈ Normal(μ, σ²/n). Standardise to find probabilities.",
+    "front": "Individual claim amounts have mean 200 and standard deviation 50. A random sample of n = 100 claims is taken.\n\n(i) State the Central Limit Theorem as it applies to the sample mean. **[1]**\n(ii) State the approximate distribution of the sample mean x̄. **[2]**\n(iii) Estimate P(x̄ > 210). **[2]**",
+    "model_answer": "**Approach:** CLT: for large n the sample mean is approximately Normal(μ, σ²/n) regardless of the population shape. Standardise to get probabilities.\n\n**Solution:**\n(i) For independent, identically distributed observations with finite mean μ and variance σ², the distribution of the sample mean tends to a Normal distribution as n → ∞ (whatever the parent distribution).\n(ii) x̄ ≈ Normal(μ = 200, σ²/n = 50²/100 = 25), i.e. mean 200 and standard deviation 5.\n(iii) P(x̄ > 210) = P(Z > (210 − 200)/5) = P(Z > 2) = 1 − 0.9772 = 0.0228.",
+    "mark_scheme": [
+      {"point": "States CLT (mean → Normal for large n)", "marks": 1},
+      {"point": "x̄ ≈ Normal(200, 25)", "marks": 2},
+      {"point": "Standardise Z = 2", "marks": 1},
+      {"point": "P = 0.0228", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.2-2",
+    "topic": "3.2 Confidence intervals",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Large-sample CI for a proportion: p̂ ± z·√(p̂(1−p̂)/n).",
+    "front": "In a sample of n = 200 policies, 90 lapse, giving p̂ = 0.45.\n\n(i) Write down the formula for an approximate 95% confidence interval for the lapse probability p. **[1]**\n(ii) Calculate the interval. **[3]**\n(iii) Interpret it. **[1]**",
+    "model_answer": "**Approach:** Large-sample CI for a proportion: p̂ ± z_{0.025}·√(p̂(1−p̂)/n), with z = 1.96.\n\n**Solution:**\n(i) 95% CI = p̂ ± 1.96·√(p̂(1−p̂)/n).\n(ii) Standard error = √(0.45·0.55/200) = √0.0012375 = 0.03518. Margin = 1.96·0.03518 = 0.0690. CI = 0.45 ± 0.069 = (0.381, 0.519).\n(iii) We are 95% confident the true lapse probability lies between about 38.1% and 51.9% — equivalently, 95% of intervals constructed this way would contain the true p.",
+    "mark_scheme": [
+      {"point": "Correct CI formula", "marks": 1},
+      {"point": "SE = 0.0352", "marks": 1},
+      {"point": "Margin = 0.069", "marks": 1},
+      {"point": "CI = (0.381, 0.519)", "marks": 1},
+      {"point": "Correct interpretation", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-CS1B-3",
+    "topic": "CS1B R — regression",
+    "module": 4,
+    "type": "r",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "lm() to fit; summary() for R² and coefficients; predict(..., interval=\"prediction\"); plot(model) / qqnorm for diagnostics.",
+    "front": "(CS1B / R) A data frame `dat` has numeric columns `y` and `x`.\n\n(i) Write R code to fit a simple linear regression of `y` on `x` and display the coefficient estimates and R². **[2]**\n(ii) Write code to predict `y` at `x = 12` with a 95% prediction interval. **[2]**\n(iii) Write code to check the Normality and equal-variance assumptions, and name what each check looks at. **[3]**",
+    "model_answer": "**Approach:** `lm()` fits the model; `summary()` reports coefficients and R²; `predict()` with `interval=\"prediction\"` gives a PI; residual plots check the assumptions. Always say what each diagnostic checks.\n\n**Solution:**\n(i)\n```r\nfit <- lm(y ~ x, data = dat)\nsummary(fit)          # coefficient estimates and Multiple R-squared\n```\n(ii)\n```r\npredict(fit, newdata = data.frame(x = 12), interval = \"prediction\", level = 0.95)\n```\n(iii)\n```r\nplot(fit)             # diagnostic plots, or individually:\nqqnorm(resid(fit)); qqline(resid(fit))   # Normality of residuals\nplot(fitted(fit), resid(fit))            # equal variance / linearity\n```\nThe Q-Q plot checks Normality (points should follow the line); the residuals-vs-fitted plot checks constant variance and linearity (random scatter around 0, no funnel or curve).",
+    "mark_scheme": [
+      {"point": "lm(y ~ x, data = dat)", "marks": 1},
+      {"point": "summary(fit) for coefficients and R²", "marks": 1},
+      {"point": "predict with interval = \"prediction\" at x = 12", "marks": 2},
+      {"point": "qqnorm/qqline for Normality", "marks": 1},
+      {"point": "residuals vs fitted for equal variance, with explanation", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-4",
+    "topic": "CS1B R — chi-square test",
+    "module": 3,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Build the table with matrix(); chisq.test(); read the p-value; chisq.test()$expected checks the expected-count assumption.",
+    "front": "(CS1B / R) A 2×2 contingency table of counts is: row 1 = (30, 70), row 2 = (20, 280).\n\n(i) Write R code to create this table and carry out a chi-square test of association. **[3]**\n(ii) The output gives `p-value = 1.0e-09`. State the conclusion at the 5% level. **[2]**\n(iii) State how you would check the validity of the chi-square approximation in R. **[1]**",
+    "model_answer": "**Approach:** Build the table with `matrix(..., byrow = TRUE)`, run `chisq.test()`, interpret the p-value, and check expected counts via `$expected`.\n\n**Solution:**\n(i)\n```r\ntab <- matrix(c(30, 70, 20, 280), nrow = 2, byrow = TRUE)\nchisq.test(tab)\n```\n(ii) p = 1.0×10⁻⁹ < 0.05, so we reject H₀ of independence: there is very strong evidence of an association between the row and column variables.\n(iii) Inspect the expected frequencies with `chisq.test(tab)$expected`; the χ² approximation is reliable when these are not too small (a common rule: all expected counts ≥ 5).",
+    "mark_scheme": [
+      {"point": "matrix(c(30,70,20,280), nrow = 2, byrow = TRUE)", "marks": 2},
+      {"point": "chisq.test(tab)", "marks": 1},
+      {"point": "p < 0.05 → reject, association (in context)", "marks": 2},
+      {"point": "Check $expected counts ≥ 5", "marks": 1}
+    ]
+  }
+]

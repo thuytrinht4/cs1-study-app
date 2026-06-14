@@ -59,8 +59,10 @@ In the browser: create an account → log in → "Import starter deck" → **Sta
 - `pages/3_📊_Reports.py` — minutes/day vs goal, accuracy trend, time by topic, mastery by module, due-card forecast. **(M4)**
 - `pages/4_📅_Plan.py` — deadline-aware study plan: today's task list by topic, coverage to the exam, a "behind by" meter, and a 14-day forecast.
 - `pages/5_🧭_Method.py` — exam method & answer-planning guide: the 5-step method, time budget, and per-topic answer skeletons/mnemonics.
+- `pages/6_📝_Mock.py` — timed mock exam: assembles a paper, runs a countdown, AI-marks the whole paper (or self-mark), reports score/pass and a per-question breakdown.
 - `cs1/plan.py` — pure planning logic on top of FSRS: adaptive new-card target, coverage tracking, behind-ness, forecast.
-- `data/exam_cards.json` — 13 past-paper-style, multi-part exam questions with full model answers + mark schemes (import from Home; study via the "Exam-style questions" deck). Mark schemes also sharpen the AI marking.
+- `data/exam_cards.json`, `data/exam_cards_2.json` — 37 past-paper-style, multi-part exam questions (239 marks) with full model answers + mark schemes, weighted to GLMs, regression, hypothesis testing and Bayesian. Import/update from Home; study via the "Exam-style questions" deck; mark schemes also sharpen the AI marking.
+- AI question generator (`ai.generate_exam_question`) — Home button to generate a brand-new exam question on any topic on demand.
 - `schema.sql` — database tables + row-level security.
 
 ## Next milestone

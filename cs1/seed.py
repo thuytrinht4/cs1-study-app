@@ -8,8 +8,10 @@ import json
 from pathlib import Path
 from . import db
 
-SEED_PATH = Path(__file__).resolve().parent.parent / "data" / "seed_cards.json"
-EXAM_PATH = Path(__file__).resolve().parent.parent / "data" / "exam_cards.json"
+_DATA = Path(__file__).resolve().parent.parent / "data"
+SEED_PATH = _DATA / "seed_cards.json"
+# Exam-style questions can be split across several files; all are merged.
+EXAM_PATHS = [_DATA / "exam_cards.json", _DATA / "exam_cards_2.json"]
 
 
 def load_seed() -> list[dict]:
@@ -18,8 +20,12 @@ def load_seed() -> list[dict]:
 
 
 def load_exam() -> list[dict]:
-    with open(EXAM_PATH, encoding="utf-8") as f:
-        return json.load(f)
+    cards: list[dict] = []
+    for p in EXAM_PATHS:
+        if p.exists():
+            with open(p, encoding="utf-8") as f:
+                cards.extend(json.load(f))
+    return cards
 
 
 def import_seed(user_id: str) -> int:

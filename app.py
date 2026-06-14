@@ -4,7 +4,7 @@ Run:  streamlit run app.py
 """
 import streamlit as st
 
-from cs1 import config, db, seed, auth, plan
+from cs1 import config, db, seed, auth, plan, ai
 
 st.set_page_config(page_title="CS1 Study Trainer", page_icon="📘", layout="centered")
 st.title("📘 CS1 Study Trainer")
@@ -75,26 +75,55 @@ pc1, pc2 = st.columns(2)
 pc1.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
 pc2.page_link("pages/4_📅_Plan.py", label="📅 See full plan to the exam", icon="📅")
 
-# ---------------------------------------------------------------- extra content
+# ---------------------------------------------------------------- exam practice
 st.divider()
-st.page_link("pages/5_🧭_Method.py",
-             label="🧭 Exam method & answer-planning guide", icon="🧭")
-if seed.exam_loaded(cards):
-    n_exam = sum(1 for c in cards if c.get("source") == "exam")
-    st.caption(f"✅ {n_exam} past-paper-style questions in your bank — study them via the "
-               "**Exam-style questions** deck on the Study page.")
-else:
-    with st.expander("➕ Add past-paper-style exam questions (with mark schemes)"):
-        st.write("A set of multi-part, applied CS1 questions — full worked model answers and "
-                 "mark schemes — covering the high-yield topics (GLMs, regression, hypothesis "
-                 "testing, MLE, Bayesian/credibility, plus CS1B R). These also make the AI "
-                 "marking much more accurate.")
-        if st.button("Import exam-style questions", type="primary"):
-            with st.spinner("Importing…"):
-                n = seed.import_exam(uid)
-            st.success(f"Imported {n} exam-style questions. Pick the 'Exam-style questions' "
-                       "deck on the Study page.")
-            st.rerun()
+st.markdown("### Exam practice")
+xc1, xc2 = st.columns(2)
+xc1.page_link("pages/6_📝_Mock.py", label="📝 Take a timed mock exam", icon="📝")
+xc2.page_link("pages/5_🧭_Method.py", label="🧭 Exam method & answer planning", icon="🧭")
+
+n_bank = sum(1 for c in cards if c.get("source") == "exam")
+try:
+    n_avail = len(seed.load_exam())
+except Exception:
+    n_avail = 0
+with st.expander(f"➕ Add / update past-paper-style questions  ·  {n_bank} in your bank",
+                 expanded=(n_bank == 0)):
+    if n_bank < n_avail:
+        st.write(f"**{n_avail - n_bank} new** built-in exam question(s) available ({n_avail} total) — "
+                 "multi-part, worked model answers, mark schemes, weighted to GLMs, regression, "
+                 "hypothesis testing and Bayesian.")
+    else:
+        st.write(f"All {n_avail} built-in exam questions are imported. Re-importing is harmless.")
+    if st.button(f"Import / update exam questions ({n_avail})", type="primary"):
+        with st.spinner("Importing…"):
+            n = seed.import_exam(uid)
+        st.success(f"Imported/updated {n} exam questions. Study them via the "
+                   "'Exam-style questions' deck, or take a mock.")
+        st.rerun()
+
+    st.divider()
+    if config.anthropic_ready():
+        st.markdown("**🤖 Generate a brand-new question with AI**")
+        topics = ["4.2 GLMs", "4.1 Linear regression", "3.3 Hypothesis testing",
+                  "3.1 Estimation & MLE", "5.1 Bayesian statistics", "5.2 Credibility theory",
+                  "2.1 Distributions", "3.2 Confidence intervals", "CS1B R — modelling"]
+        gtopic = st.selectbox("Topic", topics, key="gen_topic")
+        custom = st.text_input("…or type your own topic", key="gen_custom",
+                               placeholder="e.g. Poisson GLM with an offset")
+        if st.button("Generate exam question (AI)"):
+            chosen = custom.strip() or gtopic
+            with st.spinner(f"Claude is writing a '{chosen}' question…"):
+                try:
+                    q = ai.generate_exam_question(chosen)
+                    db.insert_generated_card(uid, q)
+                    st.success(f"Added a new {q.get('max_marks', '?')}-mark question on "
+                               f"{q.get('topic', chosen)}. It's in the 'Exam-style questions' deck.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Generation failed: {e}")
+    else:
+        st.caption("Add an ANTHROPIC_API_KEY in Secrets to also generate brand-new questions on demand.")
 
 # ---------------------------------------------------------------- M0 connectivity checks (optional)
 with st.expander("Setup checks (M0)"):

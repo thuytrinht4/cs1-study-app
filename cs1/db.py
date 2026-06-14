@@ -83,6 +83,25 @@ def upsert_cards(rows: list[dict]):
         client().table("cards").upsert(rows).execute()
 
 
+def insert_generated_card(user_id: str, q: dict) -> str:
+    """Insert one AI-generated exam-style card; returns its new id."""
+    cid = "exai_" + uuid.uuid4().hex[:10]
+    client().table("cards").upsert({
+        "id": cid,
+        "topic": q.get("topic") or "Exam practice",
+        "module": q.get("module"),
+        "type": q.get("type", "concept"),
+        "front": q["front"],
+        "model_answer": q["model_answer"],
+        "mark_scheme": q.get("mark_scheme"),
+        "max_marks": q.get("max_marks", 6),
+        "source": "exam",
+        "owner_id": user_id,
+        "is_active": True,
+    }).execute()
+    return cid
+
+
 def save_card_state(user_id: str, card_id: str, fsrs_dict: dict, reps: int):
     client().table("card_states").upsert({
         "user_id": user_id,
