@@ -75,6 +75,27 @@ pc1, pc2 = st.columns(2)
 pc1.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
 pc2.page_link("pages/4_📅_Plan.py", label="📅 See full plan to the exam", icon="📅")
 
+# ---------------------------------------------------------------- extra content
+st.divider()
+st.page_link("pages/5_🧭_Method.py",
+             label="🧭 Exam method & answer-planning guide", icon="🧭")
+if seed.exam_loaded(cards):
+    n_exam = sum(1 for c in cards if c.get("source") == "exam")
+    st.caption(f"✅ {n_exam} past-paper-style questions in your bank — study them via the "
+               "**Exam-style questions** deck on the Study page.")
+else:
+    with st.expander("➕ Add past-paper-style exam questions (with mark schemes)"):
+        st.write("A set of multi-part, applied CS1 questions — full worked model answers and "
+                 "mark schemes — covering the high-yield topics (GLMs, regression, hypothesis "
+                 "testing, MLE, Bayesian/credibility, plus CS1B R). These also make the AI "
+                 "marking much more accurate.")
+        if st.button("Import exam-style questions", type="primary"):
+            with st.spinner("Importing…"):
+                n = seed.import_exam(uid)
+            st.success(f"Imported {n} exam-style questions. Pick the 'Exam-style questions' "
+                       "deck on the Study page.")
+            st.rerun()
+
 # ---------------------------------------------------------------- M0 connectivity checks (optional)
 with st.expander("Setup checks (M0)"):
     st.write(f"Supabase: connected · {len(cards)} cards in your bank")

@@ -19,6 +19,7 @@ st.title("Study")
 
 DECKS = {
     "All cards": lambda c: True,
+    "Exam-style questions": lambda c: c.get("source") == "exam",
     "CS1A theory only": lambda c: c["type"] != "r",
     "CS1B R code only": lambda c: c["type"] == "r",
     "Module 1 - Data analysis": lambda c: c["module"] == 1 and c["type"] != "r",
@@ -122,11 +123,27 @@ if not queue:
 card = st.session_state["cards_by_id"][queue[0]]
 is_new = card["id"] not in st.session_state["states"]
 
+max_marks = card.get("max_marks")
+marks_txt = f" - {max_marks} marks" if (card.get("source") == "exam" and max_marks) else ""
 st.caption(f"{len(queue)} left - {card['topic']} - "
-           f"{'new' if is_new else 'review'} - {card['type']} - {mode}")
-st.markdown("#### " + card["front"], unsafe_allow_html=True)
+           f"{'new' if is_new else 'review'} - {card['type']}{marks_txt} - {mode}")
+with st.container(border=True):
+    st.markdown(card["front"], unsafe_allow_html=True)
 if card.get("hint") and not st.session_state["revealed"]:
     st.caption("Hint: " + card["hint"])
+
+
+def render_mark_scheme(card):
+    """Show the per-point mark scheme on reveal (exam cards carry one)."""
+    ms = card.get("mark_scheme")
+    if not ms:
+        return
+    with st.expander("📋 Mark scheme — where the marks are", expanded=True):
+        for item in ms:
+            if isinstance(item, dict):
+                st.markdown(f"- **[{item.get('marks', '')}]** {item.get('point', '')}")
+            else:
+                st.markdown(f"- {item}")
 
 
 def advance():
@@ -205,6 +222,7 @@ if deep:
         st.divider()
         st.markdown("**Model answer**")
         st.markdown(card["model_answer"], unsafe_allow_html=True)
+        render_mark_scheme(card)
         st.divider()
         grade_buttons(suggested=gr.get("suggested_rating"))
 
@@ -216,6 +234,8 @@ else:
             st.rerun()
     else:
         st.divider()
+        st.markdown("**Model answer**")
         st.markdown(card["model_answer"], unsafe_allow_html=True)
+        render_mark_scheme(card)
         st.divider()
         grade_buttons()

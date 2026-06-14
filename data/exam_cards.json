@@ -1,0 +1,240 @@
+[
+  {
+    "id": "EX-3.3-1",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Two independent samples, variances unknown but assumed equal → pooled t-test. Use the full skeleton.",
+    "front": "An insurer compares mean claim sizes in two regions. Independent samples give:\n\n- Region A: n₁ = 10, x̄₁ = 420, s₁ = 60\n- Region B: n₂ = 12, x̄₂ = 380, s₂ = 50\n\nTest, at the 5% level, whether the mean claim sizes differ.\n\n(i) State the hypotheses. **[1]**\n(ii) State the assumptions of the test. **[1]**\n(iii) Calculate the pooled variance and the test statistic. **[3]**\n(iv) State your conclusion in context. **[2]**",
+    "model_answer": "**Approach:** Two independent samples, variances unknown but assumed equal → two-sample pooled t-test. Skeleton: H₀/H₁ → assumptions → pooled s² → test statistic → compare to t → conclude *in context*.\n\n**Solution:**\n(i) H₀: μ_A = μ_B  vs  H₁: μ_A ≠ μ_B (two-sided).\n(ii) Both populations Normal, the two samples independent, equal (unknown) variances.\n(iii) Pooled variance s_p² = [(n₁−1)s₁² + (n₂−1)s₂²]/(n₁+n₂−2) = [9·3600 + 11·2500]/20 = 59900/20 = 2995, so s_p = 54.73.\nStandard error = s_p·√(1/n₁ + 1/n₂) = 54.73·√(0.1 + 0.0833) = 54.73·0.4282 = 23.43.\nt = (x̄₁ − x̄₂)/SE = (420 − 380)/23.43 = 1.71 on n₁+n₂−2 = 20 df.\n(iv) Critical value t₀.₀₂₅,₂₀ = 2.086. Since |1.71| < 2.086 we do **not** reject H₀: there is insufficient evidence at the 5% level of a difference in mean claim sizes between the regions.",
+    "mark_scheme": [
+      {"point": "Correct two-sided hypotheses", "marks": 1},
+      {"point": "Assumptions: Normal, independent, equal variance", "marks": 1},
+      {"point": "Pooled variance = 2995", "marks": 1},
+      {"point": "Standard error = 23.43", "marks": 1},
+      {"point": "Test statistic t = 1.71 on 20 df", "marks": 1},
+      {"point": "Correct critical value 2.086", "marks": 1},
+      {"point": "Conclusion in context (do not reject)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.1-1",
+    "topic": "3.1 Estimation & MLE",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "MLE recipe 'L-L-D-S-S'; then use invariance and Fisher information.",
+    "front": "Claim waiting times X₁,…,Xₙ are modelled as independent Exponential(λ).\n\n(i) Write down the likelihood and the log-likelihood. **[2]**\n(ii) Derive the maximum likelihood estimator λ̂ and confirm it is a maximum. **[3]**\n(iii) State the MLE of the mean waiting time, justifying briefly. **[1]**\n(iv) State the approximate large-sample variance of λ̂. **[1]**",
+    "model_answer": "**Approach:** MLE recipe 'L-L-D-S-S' — Likelihood → Log → Differentiate → Set to 0 → Solve, then confirm a maximum and use invariance / Fisher information.\n\n**Solution:**\n(i) f(x;λ) = λe^(−λx). Likelihood L(λ) = ∏ λe^(−λxᵢ) = λⁿ e^(−λΣxᵢ). Log-likelihood ℓ(λ) = n ln λ − λΣxᵢ.\n(ii) dℓ/dλ = n/λ − Σxᵢ. Set = 0 ⇒ λ̂ = n/Σxᵢ = 1/x̄. Second derivative −n/λ² < 0, confirming a maximum.\n(iii) By the invariance property of MLEs, the MLE of the mean 1/λ is 1/λ̂ = x̄.\n(iv) Fisher information I(λ) = n/λ², so Var(λ̂) ≈ λ²/n (estimated by λ̂²/n).",
+    "mark_scheme": [
+      {"point": "Correct likelihood λⁿe^(−λΣx)", "marks": 1},
+      {"point": "Correct log-likelihood n ln λ − λΣx", "marks": 1},
+      {"point": "Differentiate and set to zero", "marks": 1},
+      {"point": "Solve λ̂ = 1/x̄", "marks": 1},
+      {"point": "Confirm maximum (2nd derivative < 0)", "marks": 1},
+      {"point": "MLE of mean = x̄ by invariance", "marks": 1},
+      {"point": "Asymptotic variance λ²/n", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.2-1",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 9,
+    "source": "exam",
+    "hint": "GLM = Random + Systematic + Link. Predict via μ = exp(η); compare nested models by change in deviance vs χ².",
+    "front": "An insurer fits a Poisson generalised linear model with a log link to the number of claims, with policyholder age as a covariate. The fitted linear predictor is η = −1.20 + 0.050·age.\n\n(i) State the three components of a GLM. **[2]**\n(ii) Explain why a Poisson distribution with a log link is appropriate here. **[2]**\n(iii) Estimate the expected number of claims for a policyholder aged 40. **[2]**\n(iv) Interpret the age coefficient as a rate ratio. **[1]**\n(v) Adding two further covariates reduces the deviance from 45.2 (48 df) to 38.0 (46 df). Test whether the larger model is a significant improvement. **[2]**",
+    "model_answer": "**Approach:** GLM = Random + Systematic + Link. For counts use Poisson with a log link (keeps μ > 0, makes effects multiplicative). Predict via μ = exp(η); compare nested models by the change in deviance against χ² on Δparameters df.\n\n**Solution:**\n(i) Random component (response from the exponential family — here Poisson); systematic component (linear predictor η = Σβⱼxⱼ); link function g(μ) = η.\n(ii) Claim counts are non-negative integers → Poisson; the log link keeps the fitted mean positive and makes covariate effects multiplicative, which is natural for rates.\n(iii) η = −1.20 + 0.050·40 = 0.80, so μ = e^0.80 = 2.23 claims.\n(iv) exp(0.050) = 1.051: each extra year of age multiplies the expected claim rate by ≈ 1.051, i.e. a 5.1% increase per year.\n(v) ΔDeviance = 45.2 − 38.0 = 7.2 on 48 − 46 = 2 df. Compare with χ²₀.₀₅,₂ = 5.991. Since 7.2 > 5.991, reject the smaller model: the two extra covariates significantly improve the fit.",
+    "mark_scheme": [
+      {"point": "Names random / systematic / link components", "marks": 2},
+      {"point": "Counts → Poisson; log link keeps μ>0 / multiplicative", "marks": 2},
+      {"point": "η = 0.80 and μ = e^0.80 = 2.23", "marks": 2},
+      {"point": "exp(0.05) = 1.051 interpreted as 5.1% per year", "marks": 1},
+      {"point": "ΔD = 7.2 on 2 df > 5.991 ⇒ larger model better", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-4.1-1",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 10,
+    "source": "exam",
+    "hint": "Assumptions = LINE. Slope = S_xy/S_xx. R² = SSR/S_yy. Test slope with t = β̂₁/se(β̂₁).",
+    "front": "A simple linear regression of y on x uses n = 10 observations with:\n\nx̄ = 5, ȳ = 20, S_xx = 80, S_xy = 160, S_yy = 360.\n\n(i) State the assumptions of the linear regression model. **[2]**\n(ii) Estimate the slope and intercept. **[2]**\n(iii) Calculate R² and interpret it. **[2]**\n(iv) Test whether the slope differs significantly from zero at the 5% level. **[3]**\n(v) State, without calculating, how a prediction interval for a new response differs from a confidence interval for the mean response. **[1]**",
+    "model_answer": "**Approach:** Assumptions = 'LINE'. Slope = S_xy/S_xx, intercept from the means. R² = SSR/S_yy. Test slope with t = β̂₁/se(β̂₁), se = √(σ̂²/S_xx), σ̂² = SSE/(n−2).\n\n**Solution:**\n(i) Linearity, Independence of errors, Normality of errors, Equal variance (homoscedasticity) — 'LINE'.\n(ii) β̂₁ = S_xy/S_xx = 160/80 = 2. β̂₀ = ȳ − β̂₁x̄ = 20 − 2·5 = 10. Fitted line ŷ = 10 + 2x.\n(iii) SSR = S_xy²/S_xx = 160²/80 = 320; R² = SSR/S_yy = 320/360 = 0.889. About 88.9% of the variation in y is explained by the regression on x.\n(iv) SSE = S_yy − SSR = 360 − 320 = 40; σ̂² = SSE/(n−2) = 40/8 = 5. se(β̂₁) = √(σ̂²/S_xx) = √(5/80) = 0.25. t = β̂₁/se = 2/0.25 = 8.0 on 8 df. t₀.₀₂₅,₈ = 2.306; since 8.0 > 2.306, reject H₀: the slope is significantly different from zero.\n(v) A prediction interval for a single new response is **wider** because it adds the variability of an individual observation about the mean, not just the uncertainty in the estimated mean.",
+    "mark_scheme": [
+      {"point": "LINE assumptions", "marks": 2},
+      {"point": "β̂₁ = 2 and β̂₀ = 10", "marks": 2},
+      {"point": "R² = 0.889 with interpretation", "marks": 2},
+      {"point": "σ̂² = 5 and se(β̂₁) = 0.25", "marks": 1},
+      {"point": "t = 8.0 on 8 df vs 2.306", "marks": 1},
+      {"point": "Conclusion: slope significant", "marks": 1},
+      {"point": "PI wider than CI (individual vs mean)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-5.1-1",
+    "topic": "5.1 Bayesian statistics",
+    "module": 5,
+    "type": "concept",
+    "max_marks": 9,
+    "source": "exam",
+    "hint": "Beta prior + Binomial likelihood → Beta posterior (conjugate). Bayes estimate = mean/median/mode for quadratic/absolute/0-1 loss.",
+    "front": "The probability p that a policy lapses has prior p ~ Beta(2, 2). In a sample of 20 policies, 8 lapse.\n\n(i) Using posterior ∝ prior × likelihood, identify the form of the posterior. **[2]**\n(ii) State the posterior distribution. **[2]**\n(iii) Give the Bayesian estimate of p under quadratic loss. **[1]**\n(iv) State the estimates under absolute-error and 0–1 (all-or-nothing) loss. **[2]**\n(v) Show that the posterior mean is a credibility estimate Z·(x/n) + (1−Z)·(prior mean), and find Z. **[2]**",
+    "model_answer": "**Approach:** Beta prior + Binomial likelihood → Beta posterior (conjugate). For Beta(α,β): mean α/(α+β), mode (α−1)/(α+β−2). Bayes estimate = posterior mean / median / mode for quadratic / absolute / 0–1 loss.\n\n**Solution:**\n(i) Likelihood ∝ p^x(1−p)^(n−x); prior ∝ p^(α−1)(1−p)^(β−1). Product ∝ p^(α+x−1)(1−p)^(β+n−x−1) — a Beta kernel, so the posterior is Beta (conjugate).\n(ii) Posterior = Beta(α+x, β+n−x) = Beta(2+8, 2+12) = Beta(10, 14).\n(iii) Quadratic loss ⇒ posterior mean = 10/(10+14) = 10/24 = 0.417.\n(iv) Absolute-error loss ⇒ posterior median (≈ 0.415); 0–1 loss ⇒ posterior mode = (10−1)/(24−2) = 9/22 = 0.409.\n(v) Posterior mean = (α₀+x)/(α₀+β₀+n) = Z·(x/n) + (1−Z)·(α₀/(α₀+β₀)) with Z = n/(n+α₀+β₀) = 20/(20+4) = 0.833. Check: 0.833·0.4 + 0.167·0.5 = 0.417 ✓.",
+    "mark_scheme": [
+      {"point": "Multiplies kernels to get Beta form / states conjugacy", "marks": 2},
+      {"point": "Posterior Beta(10, 14)", "marks": 2},
+      {"point": "Quadratic loss → mean 0.417", "marks": 1},
+      {"point": "Absolute → median; 0–1 → mode 0.409", "marks": 2},
+      {"point": "Credibility form with Z = 0.833", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-4.2-2",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Logistic GLM: logit link; inverse π = e^η/(1+e^η); exp(β) is an odds ratio (not a probability ratio).",
+    "front": "A logistic regression models the probability of a claim, with fitted log-odds logit(π) = −2.0 + 0.8·x, where x = 1 for high-risk policies and 0 otherwise.\n\n(i) Write down the link function and the range it maps to. **[1]**\n(ii) Calculate the fitted claim probability for a standard (x = 0) and a high-risk (x = 1) policy. **[3]**\n(iii) Interpret the coefficient 0.8 as an odds ratio. **[2]**\n(iv) State one reason a logit link is preferred to an identity link for a probability. **[1]**",
+    "model_answer": "**Approach:** Logistic GLM: g(π) = logit(π) = ln(π/(1−π)), inverse π = e^η/(1+e^η). exp(β) is an odds ratio.\n\n**Solution:**\n(i) Logit link, g(π) = ln(π/(1−π)); it maps π ∈ (0,1) onto the whole real line (−∞, ∞).\n(ii) x = 0: η = −2.0, π = e^(−2)/(1+e^(−2)) = 0.135/1.135 = 0.119.  x = 1: η = −2.0 + 0.8 = −1.2, π = e^(−1.2)/(1+e^(−1.2)) = 0.301/1.301 = 0.231.\n(iii) exp(0.8) = 2.23: high-risk policies have about 2.23 times the **odds** of a claim compared with standard policies (this is an odds ratio, not 2.23× the probability).\n(iv) The logit link (unlike the identity link) constrains fitted probabilities to (0,1), so predictions can never fall below 0 or above 1.",
+    "mark_scheme": [
+      {"point": "Logit link mapping (0,1) → ℝ", "marks": 1},
+      {"point": "π(x=0) = 0.119", "marks": 1},
+      {"point": "π(x=1) = 0.231", "marks": 2},
+      {"point": "Odds ratio exp(0.8) = 2.23, interpreted as odds", "marks": 2},
+      {"point": "Logit keeps π within (0,1)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.1-1",
+    "topic": "2.1 Distributions",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Poisson: mean = variance. Sum of 12 monthly Poissons is Poisson(48); Normal-approximate with a ±0.5 continuity correction.",
+    "front": "Monthly claims on a portfolio follow a Poisson distribution with mean λ = 4.\n\n(i) Calculate P(no claims in a month). **[1]**\n(ii) Explain how you would detect over-dispersion and what distribution you would use instead. **[2]**\n(iii) Using a Normal approximation with a continuity correction, estimate the probability that the **annual** number of claims exceeds 55. **[3]**",
+    "model_answer": "**Approach:** Poisson has mean = variance. The annual total (sum of 12 monthly Poissons) is Poisson(48); approximate by Normal(48, 48) with a ±0.5 continuity correction.\n\n**Solution:**\n(i) P(X = 0) = e^(−4) = 0.0183.\n(ii) For a Poisson, mean = variance. If the sample variance is substantially larger than the mean (over-dispersion), use a Negative Binomial distribution instead.\n(iii) Annual total ~ Poisson(48) ≈ Normal(μ = 48, σ² = 48), σ = 6.928. P(X > 55) = P(X ≥ 56) ≈ P(Z > (55.5 − 48)/6.928) = P(Z > 1.083) = 1 − 0.8606 = 0.139.",
+    "mark_scheme": [
+      {"point": "P(X=0) = e^(−4) = 0.0183", "marks": 1},
+      {"point": "mean = variance; over-dispersion → Negative Binomial", "marks": 2},
+      {"point": "Annual Poisson(48) ≈ Normal(48, 48)", "marks": 1},
+      {"point": "Continuity correction uses 55.5", "marks": 1},
+      {"point": "P ≈ 0.139", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.4-1",
+    "topic": "2.4 Generating functions",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "MGF of a sum of independents = product of MGFs. A recognised MGF identifies the distribution. CGF = ln(MGF).",
+    "front": "X₁,…,Xₙ are independent Exponential(λ) random variables.\n\n(i) Write down the moment generating function of a single Exponential(λ). **[1]**\n(ii) Derive the MGF of the sum S = ΣXᵢ and identify its distribution. **[3]**\n(iii) Use the cumulant generating function to find the mean and variance of a single Exponential. **[2]**",
+    "model_answer": "**Approach:** MGF of a sum of independents = product of MGFs; a recognised MGF identifies the distribution. CGF = ln(MGF): first derivative at 0 = mean, second = variance.\n\n**Solution:**\n(i) M_X(t) = λ/(λ−t), for t < λ.\n(ii) By independence, M_S(t) = ∏ M_X(t) = (λ/(λ−t))ⁿ = (1 − t/λ)^(−n). This is the MGF of a Gamma(n, λ) distribution, so S ~ Gamma(n, λ).\n(iii) C_X(t) = ln M_X(t) = ln λ − ln(λ−t). C′(t) = 1/(λ−t) ⇒ C′(0) = 1/λ = mean. C″(t) = 1/(λ−t)² ⇒ C″(0) = 1/λ² = variance.",
+    "mark_scheme": [
+      {"point": "M_X(t) = λ/(λ−t)", "marks": 1},
+      {"point": "Multiplies MGFs for the sum", "marks": 1},
+      {"point": "(λ/(λ−t))ⁿ obtained", "marks": 1},
+      {"point": "Identifies Gamma(n, λ)", "marks": 1},
+      {"point": "CGF gives mean 1/λ", "marks": 1},
+      {"point": "CGF gives variance 1/λ²", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.2-1",
+    "topic": "3.2 Confidence intervals",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "(n−1)s²/σ² ~ χ²_{n−1}. The interval is asymmetric — never write s² ± something.",
+    "front": "A sample of n = 15 claim amounts has sample variance s² = 24. Assume the amounts are Normally distributed.\n\n(i) Write down the pivotal quantity used for inference on σ² and its distribution. **[1]**\n(ii) Construct a 95% confidence interval for σ². **[3]**\n(iii) Comment on the shape of the interval. **[2]**",
+    "model_answer": "**Approach:** The pivot (n−1)s²/σ² ~ χ²_{n−1}. Invert it for the CI; because χ² is asymmetric the interval is **not** symmetric about s².\n\n**Solution:**\n(i) (n−1)s²/σ² ~ χ²_{n−1} = χ²₁₄.\n(ii) 95% CI = ( (n−1)s² / χ²_{0.975,14} , (n−1)s² / χ²_{0.025,14} ). With χ²_{0.025,14} = 26.12, χ²_{0.975,14} = 5.629 and (n−1)s² = 14·24 = 336:  CI = (336/26.12 , 336/5.629) = (12.9 , 59.7).\n(iii) The interval is asymmetric about s² = 24 — the upper limit is far further from 24 than the lower — reflecting the right-skew of the chi-square distribution. So a variance CI must never be written as s² ± (something).",
+    "mark_scheme": [
+      {"point": "Pivot (n−1)s²/σ² ~ χ²₁₄", "marks": 1},
+      {"point": "Correct CI formula (tails swapped)", "marks": 1},
+      {"point": "Correct χ² values 26.12 and 5.629", "marks": 1},
+      {"point": "CI = (12.9, 59.7)", "marks": 1},
+      {"point": "Notes asymmetry / not s² ±", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-3.3-2",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Goodness-of-fit χ² = Σ(O−E)²/E; df = categories − 1 − (#estimated parameters).",
+    "front": "A die is rolled 120 times; the observed frequencies for faces 1–6 are 14, 22, 18, 25, 21, 20. Test at the 5% level whether the die is fair.\n\n(i) State the hypotheses and the expected frequencies. **[2]**\n(ii) Calculate the chi-square test statistic. **[3]**\n(iii) State the degrees of freedom and your conclusion in context. **[2]**",
+    "model_answer": "**Approach:** Goodness-of-fit χ² = Σ(O−E)²/E, df = (categories − 1 − #estimated parameters). Under 'fair' all expected frequencies are equal.\n\n**Solution:**\n(i) H₀: the die is fair (each face has probability 1/6) vs H₁: it is not fair. Expected E = 120/6 = 20 for each face.\n(ii) χ² = Σ(O−E)²/E = [(14−20)² + (22−20)² + (18−20)² + (25−20)² + (21−20)² + (20−20)²]/20 = [36 + 4 + 4 + 25 + 1 + 0]/20 = 70/20 = 3.5.\n(iii) df = 6 − 1 = 5; χ²_{0.05,5} = 11.07. Since 3.5 < 11.07, do not reject H₀: there is no significant evidence at the 5% level that the die is unfair.",
+    "mark_scheme": [
+      {"point": "Hypotheses stated", "marks": 1},
+      {"point": "Expected frequency 20 for each face", "marks": 1},
+      {"point": "Correct (O−E)²/E terms", "marks": 2},
+      {"point": "χ² = 3.5", "marks": 1},
+      {"point": "df = 5, critical 11.07, conclusion in context", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-5.2-1",
+    "topic": "5.2 Credibility theory",
+    "module": 5,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Credibility premium = Z·(data mean) + (1−Z)·(collective mean), with Z = n/(n+k) increasing in n.",
+    "front": "Under Bühlmann credibility, a risk has individual claim experience with mean x̄ = 250 over n = 4 years. The collective (prior) mean is μ = 200. The credibility factor is Z = n/(n + k) with k = 6.\n\n(i) Calculate the credibility factor Z. **[2]**\n(ii) Calculate the credibility premium. **[2]**\n(iii) Explain how and why Z changes as n increases, and what k represents. **[2]**",
+    "model_answer": "**Approach:** Credibility premium = Z·(data mean) + (1−Z)·(collective mean), with Z = n/(n+k) increasing in n.\n\n**Solution:**\n(i) Z = n/(n+k) = 4/(4+6) = 4/10 = 0.40.\n(ii) Credibility premium = Z·x̄ + (1−Z)·μ = 0.40·250 + 0.60·200 = 100 + 120 = 220.\n(iii) As n increases, Z → 1, so more weight is placed on the risk's own experience and less on the collective — more data makes the individual mean more reliable. k = (expected process variance)/(variance of the hypothetical means); a larger k (noisier individual experience relative to between-risk variation) gives slower credibility.",
+    "mark_scheme": [
+      {"point": "Z = 0.40", "marks": 2},
+      {"point": "Premium = 0.4·250 + 0.6·200 = 220", "marks": 2},
+      {"point": "Z → 1 as n grows; k = EPV/VHM", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-1",
+    "topic": "CS1B R — modelling",
+    "module": 4,
+    "type": "r",
+    "max_marks": 8,
+    "source": "exam",
+    "hint": "t.test with a formula; read the p-value and conclude in context. glm(..., family=poisson); compare by AIC (lower is better). Always comment the output.",
+    "front": "(CS1B / R) Claim data are in a data frame `claims` with columns `cost` (numeric), `region` (factor, two levels), `nclaims` (counts) and `age`.\n\n(i) Write R code to test whether mean `cost` differs between the two regions. **[2]**\n(ii) The test prints `p-value = 0.018`. State the conclusion at the 5% level. **[2]**\n(iii) Write R code to fit a Poisson GLM for `nclaims` on `age` and compare it, by AIC, with the null model. **[4]**",
+    "model_answer": "**Approach:** Use `t.test` with a formula; read the p-value and conclude *in context*. Fit `glm(..., family = poisson)`; compare models by `AIC` (lower is better). Always add a sentence interpreting the output.\n\n**Solution:**\n(i)\n```r\nt.test(cost ~ region, data = claims)\n```\n(ii) p = 0.018 < 0.05, so we reject H₀ of equal means: there is significant evidence at the 5% level that mean claim cost differs between the two regions.\n(iii)\n```r\nfit  <- glm(nclaims ~ age, family = poisson(link = \"log\"), data = claims)\nnull <- glm(nclaims ~ 1,   family = poisson(link = \"log\"), data = claims)\nAIC(null, fit)        # lower AIC = better model\nsummary(fit)\n```\nChoose the model with the lower AIC; a substantially lower AIC for `fit` indicates that `age` improves the model.",
+    "mark_scheme": [
+      {"point": "t.test(cost ~ region, data = claims)", "marks": 2},
+      {"point": "p < 0.05 → reject; difference significant, in context", "marks": 2},
+      {"point": "glm(nclaims ~ age, family = poisson) fitted correctly", "marks": 2},
+      {"point": "AIC comparison with the null model, lower is better", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-2",
+    "topic": "CS1B R — simulation",
+    "module": 3,
+    "type": "r",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Always set.seed for reproducibility; use replicate. For Exp(rate=λ): mean = sd = 1/λ; sample-mean sd = (1/λ)/√n by the CLT.",
+    "front": "(CS1B / R) You want to illustrate the sampling distribution of the mean of samples of size 30 drawn from an Exponential(rate = 0.5) distribution.\n\n(i) Write reproducible R code to simulate 1000 such sample means. **[4]**\n(ii) Write code to estimate the mean and standard deviation of those sample means, and state what the Central Limit Theorem predicts they should be. **[3]**",
+    "model_answer": "**Approach:** Always `set.seed` for reproducibility. Use `replicate` to repeat the sampling. For Exp(rate = λ): population mean = sd = 1/λ; by the CLT the sample-mean sd is (1/λ)/√n.\n\n**Solution:**\n(i)\n```r\nset.seed(1)\nmeans <- replicate(1000, mean(rexp(30, rate = 0.5)))\n```\n(ii)\n```r\nmean(means)\nsd(means)\n```\nFor Exp(0.5) the population mean = 1/0.5 = 2 and sd = 2. By the CLT the sample means are approximately Normal with mean ≈ 2 and standard deviation ≈ 2/√30 = 0.365, so `mean(means)` should be ≈ 2 and `sd(means)` ≈ 0.365.",
+    "mark_scheme": [
+      {"point": "set.seed used for reproducibility", "marks": 1},
+      {"point": "replicate with rexp(30, rate = 0.5) and mean", "marks": 2},
+      {"point": "mean(means) and sd(means)", "marks": 1},
+      {"point": "CLT predicts mean ≈ 2", "marks": 1},
+      {"point": "CLT predicts sd ≈ 2/√30 = 0.365", "marks": 2}
+    ]
+  }
+]

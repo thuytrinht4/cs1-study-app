@@ -58,7 +58,9 @@ In the browser: create an account → log in → "Import starter deck" → **Sta
 - `pages/2_🎯_Weak_Areas.py` — run analysis, view weaknesses + coaching note, jump to targeted practice. **(M3)**
 - `pages/3_📊_Reports.py` — minutes/day vs goal, accuracy trend, time by topic, mastery by module, due-card forecast. **(M4)**
 - `pages/4_📅_Plan.py` — deadline-aware study plan: today's task list by topic, coverage to the exam, a "behind by" meter, and a 14-day forecast.
+- `pages/5_🧭_Method.py` — exam method & answer-planning guide: the 5-step method, time budget, and per-topic answer skeletons/mnemonics.
 - `cs1/plan.py` — pure planning logic on top of FSRS: adaptive new-card target, coverage tracking, behind-ness, forecast.
+- `data/exam_cards.json` — 13 past-paper-style, multi-part exam questions with full model answers + mark schemes (import from Home; study via the "Exam-style questions" deck). Mark schemes also sharpen the AI marking.
 - `schema.sql` — database tables + row-level security.
 
 ## Next milestone
