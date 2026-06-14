@@ -2,10 +2,9 @@
 
 Run:  streamlit run app.py
 """
-from datetime import date, datetime, timezone
 import streamlit as st
 
-from cs1 import config, db, seed, auth
+from cs1 import config, db, seed, auth, plan
 
 st.set_page_config(page_title="CS1 Study Trainer", page_icon="📘", layout="centered")
 st.title("📘 CS1 Study Trainer")
@@ -42,26 +41,39 @@ if not seed.is_seeded(uid):
 profile = db.ensure_profile(uid)
 cards = db.get_cards(uid)
 states = db.get_card_states(uid)
-now = datetime.now(timezone.utc)
-due = sum(1 for c in cards if c["id"] in states
-          and datetime.fromisoformat(states[c["id"]]["due"]) <= now)
-new = sum(1 for c in cards if c["id"] not in states)
+reviews = db.get_reviews(uid)
+P = plan.compute(profile, cards, states, reviews)
 
-exam_a = profile.get("exam_date_a") or "2026-09-18"
-days_to_a = (date.fromisoformat(str(exam_a)) - date.today()).days
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Due now", P["due_today"])
+c2.metric("New today", P["new_remaining_target"],
+          help="Recommended new cards to add today to stay on track for full coverage.")
+c3.metric("Covered", f"{P['seen']}/{P['total']}")
+c4.metric("Days to CS1A", P["days_to_exam"])
 
-c1, c2, c3 = st.columns(3)
-c1.metric("Due now", due)
-c2.metric("New available", new)
-c3.metric("Days to CS1A", days_to_a)
+# plan status — the "am I on track / how behind am I" answer
+if P["on_track"]:
+    st.success("✅ **On track.** Do today's plan and every topic is covered with three weeks "
+               "to spare before the exam.")
+else:
+    msg = []
+    if P["overdue"]:
+        msg.append(f"{P['overdue']} review(s) overdue")
+    if P["coverage_gap"]:
+        msg.append(f"{P['coverage_gap']} card(s) behind on coverage (~{P['coverage_days_behind']}d)")
+    st.warning("⚠️ **Behind by " + str(P["behind_cards"]) + " card(s):** " + " · ".join(msg)
+               + ". Open the Plan for a catch-up.")
 
 st.divider()
 st.markdown("### Today")
-if due + new > 0:
-    st.markdown(f"You have **{due} due** and up to **{min(new, profile.get('daily_new_limit', 18))} new** cards.")
-    st.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
+if P["due_today"] + P["new_remaining_target"] > 0:
+    st.markdown(f"Clear **{P['due_today']} due** and add **{P['new_remaining_target']} new** "
+                f"(of {P['unseen']} still unseen).")
 else:
-    st.success("Nothing due right now — great. New cards unlock as you go.")
+    st.success("Nothing required today — you're ahead. Studying more is optional.")
+pc1, pc2 = st.columns(2)
+pc1.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
+pc2.page_link("pages/4_📅_Plan.py", label="📅 See full plan to the exam", icon="📅")
 
 # ---------------------------------------------------------------- M0 connectivity checks (optional)
 with st.expander("Setup checks (M0)"):

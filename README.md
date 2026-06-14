@@ -57,6 +57,8 @@ In the browser: create an account → log in → "Import starter deck" → **Sta
 - `cs1/ai.py` — Claude calls: `grade_answer()` (Haiku, M2) + `find_weak_patterns()` (Sonnet, M3), both via tool-use structured output.
 - `pages/2_🎯_Weak_Areas.py` — run analysis, view weaknesses + coaching note, jump to targeted practice. **(M3)**
 - `pages/3_📊_Reports.py` — minutes/day vs goal, accuracy trend, time by topic, mastery by module, due-card forecast. **(M4)**
+- `pages/4_📅_Plan.py` — deadline-aware study plan: today's task list by topic, coverage to the exam, a "behind by" meter, and a 14-day forecast.
+- `cs1/plan.py` — pure planning logic on top of FSRS: adaptive new-card target, coverage tracking, behind-ness, forecast.
 - `schema.sql` — database tables + row-level security.
 
 ## Next milestone

@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 import streamlit as st
 
-from cs1 import db, scheduler, auth, ai
+from cs1 import db, scheduler, auth, ai, plan
 
 st.set_page_config(page_title="Study - CS1", page_icon="📚", layout="centered")
 uid = auth.require_login()
@@ -28,7 +28,6 @@ DECKS = {
     "Module 5 - Bayesian": lambda c: c["module"] == 5 and c["type"] != "r",
     "Targeted follow-ups (AI)": lambda c: c.get("source") == "ai_followup",
 }
-NEW_LIMIT = 18
 
 # ---------------------------------------------------------------- sidebar: mode
 ai_on = ai.available()
@@ -45,9 +44,15 @@ if deep and not ai_on:
     deep = False
 
 
-def build_queue(deck_fn):
+def build_queue(deck_fn, deck_name):
     cards = db.get_cards(uid)
     states = db.get_card_states(uid)
+    reviews = db.get_reviews(uid)
+    profile = db.ensure_profile(uid)
+    P = plan.compute(profile, cards, states, reviews)
+    # per-DAY new-card budget (today's max minus what you've already introduced).
+    # The AI-remediation deck is exempt so you can drill weak spots freely.
+    new_limit = 999 if deck_name == "Targeted follow-ups (AI)" else P["new_remaining_cap"]
     now = datetime.now(timezone.utc)
     due, new = [], []
     for c in cards:
@@ -58,7 +63,8 @@ def build_queue(deck_fn):
             new.append(c)
         elif datetime.fromisoformat(s["due"]) <= now:
             due.append(c)
-    return due + new[:NEW_LIMIT], states
+    new.sort(key=lambda c: (c.get("module") or 99, str(c.get("id"))))
+    return due + new[:new_limit], states, P
 
 
 # ---------------------------------------------------------------- init / deck change
@@ -71,7 +77,11 @@ if st.session_state.get("deck_name") != deck_name:
     st.session_state["deck_name"] = deck_name
 
 if "queue" not in st.session_state:
-    queue, states = build_queue(DECKS[deck_name])
+    queue, states, P = build_queue(DECKS[deck_name], deck_name)
+    st.session_state["plan_snapshot"] = {
+        "new_today_done": P["new_today_done"], "daily_new_cap": P["daily_new_cap"],
+        "new_remaining_cap": P["new_remaining_cap"], "unseen": P["unseen"],
+    }
     st.session_state["queue"] = [c["id"] for c in queue]
     st.session_state["cards_by_id"] = {c["id"]: c for c in queue}
     st.session_state["states"] = states
@@ -92,6 +102,13 @@ if not queue:
                    int(mins * 60_000), st.session_state.get("done", 0))
     st.success(f"Done! {st.session_state.get('done', 0)} cards in {mins:.0f} min.")
     st.balloons()
+    snap = st.session_state.get("plan_snapshot", {})
+    if (deck_name != "Targeted follow-ups (AI)" and snap.get("new_remaining_cap") == 0
+            and snap.get("unseen", 0) > 0):
+        st.info(f"You've hit today's new-card limit ({snap.get('daily_new_cap')}). "
+                f"{snap.get('unseen')} card(s) still to introduce overall — they'll unlock "
+                "tomorrow. Want more now? Raise the daily maximum on the Plan page.")
+    st.page_link("pages/4_📅_Plan.py", label="📅 See your plan & what's next", icon="📅")
     if ai.available():
         st.page_link("pages/2_🎯_Weak_Areas.py",
                      label="Analyse my answers & generate targeted practice", icon="🎯")

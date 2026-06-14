@@ -56,6 +56,13 @@ def ensure_profile(user_id: str, display_name: str = ""):
     return c.table("profiles").select("*").eq("id", user_id).single().execute().data
 
 
+def update_profile(user_id: str, fields: dict):
+    """Patch profile settings (exam dates, daily limits, goal minutes)."""
+    fields = {k: v for k, v in fields.items() if v is not None}
+    if fields:
+        client().table("profiles").update(fields).eq("id", user_id).execute()
+
+
 # ---------------------------------------------------------------- cards
 def get_cards(user_id: str) -> list[dict]:
     return (
