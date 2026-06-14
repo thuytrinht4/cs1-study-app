@@ -1,11 +1,38 @@
-"""Streamlit auth helpers built on Supabase email/password."""
+"""Streamlit auth helpers built on Supabase email/password.
+
+Single-user convenience: if APP_EMAIL/APP_PASSWORD are set in secrets, the app
+auto-signs-in (no login form, survives every redeploy). Otherwise it falls back
+to the normal login/sign-up form.
+"""
 import streamlit as st
-from . import db
+from . import db, config
 
 
 def current_user_id():
     u = st.session_state.get("user")
     return u["id"] if u else None
+
+
+def _try_autologin():
+    """Silently sign in once per session using credentials from secrets."""
+    if st.session_state.get("user") or st.session_state.get("autologin_tried"):
+        return
+    st.session_state["autologin_tried"] = True
+    if not config.autologin_ready():
+        return
+    try:
+        res = db.sign_in(config.APP_EMAIL, config.APP_PASSWORD)
+        st.session_state["user"] = {"id": res.user.id, "email": res.user.email}
+        db.ensure_profile(res.user.id, res.user.email)
+    except Exception as e:
+        st.session_state["autologin_error"] = str(e)
+
+
+def ensure_session():
+    """Return the user id, auto-logging-in if configured. None if not signed in."""
+    if not current_user_id():
+        _try_autologin()
+    return current_user_id()
 
 
 def login_form():
@@ -44,7 +71,7 @@ def login_form():
 
 def require_login():
     """Call at the top of every page. Returns the user id or stops the page."""
-    uid = current_user_id()
+    uid = ensure_session()
     if not uid:
         st.warning("Please log in on the Home page first.")
         st.stop()
@@ -52,7 +79,12 @@ def require_login():
 
 
 def logout_button():
+    # With single-user auto-login there's nothing to log out of (it would just
+    # sign back in on the next rerun), so hide the button.
+    if config.autologin_ready():
+        return
     if st.sidebar.button("Log out"):
         db.sign_out()
         st.session_state.pop("user", None)
+        st.session_state.pop("autologin_tried", None)
         st.rerun()

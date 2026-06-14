@@ -20,11 +20,14 @@ if not config.supabase_ready():
     st.stop()
 
 # ---------------------------------------------------------------- auth gate
-if not auth.current_user_id():
+uid = auth.ensure_session()          # auto-login if APP_EMAIL/APP_PASSWORD in secrets
+if not uid:
+    if config.autologin_ready() and st.session_state.get("autologin_error"):
+        st.error("Auto-login failed — check APP_EMAIL / APP_PASSWORD in Secrets. "
+                 f"({st.session_state['autologin_error']})")
     auth.login_form()
     st.stop()
 
-uid = auth.current_user_id()
 auth.logout_button()
 
 # ---------------------------------------------------------------- first run: seed
