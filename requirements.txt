@@ -1,0 +1,8 @@
+# CS1 Study App — verified against these versions (June 2026)
+streamlit>=1.40
+anthropic>=0.40          # tested with 0.109
+supabase>=2.9            # tested with 2.31
+fsrs>=6.0,<7             # tested with 6.3.1 — uses Card.to_dict()/from_dict()
+pandas>=2.2
+plotly>=5.24
+python-dotenv>=1.0

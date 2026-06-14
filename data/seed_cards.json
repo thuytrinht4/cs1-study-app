@@ -1,0 +1,732 @@
+[
+  {
+    "id": "1.1a",
+    "topic": "1.1 Descriptive Statistics",
+    "module": 1,
+    "type": "formula",
+    "front": "Sample mean and the <b>sample variance</b> — write both formulae. Why divide by $n-1$?",
+    "model_answer": "$\\bar x=\\frac1n\\sum x_i$, &nbsp; $s^2=\\frac{1}{n-1}\\sum (x_i-\\bar x)^2$.<br>Dividing by $n-1$ (degrees of freedom) makes $s^2$ an <b>unbiased</b> estimator of $\\sigma^2$; using $n$ underestimates it.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "1.1b",
+    "topic": "1.1 Descriptive Statistics",
+    "module": 1,
+    "type": "concept",
+    "front": "If $Y=aX+b$, what happens to the mean, variance and standard deviation?",
+    "model_answer": "$E[Y]=a\\,E[X]+b$, &nbsp; $\\mathrm{Var}(Y)=a^2\\mathrm{Var}(X)$, &nbsp; $\\mathrm{sd}(Y)=|a|\\,\\mathrm{sd}(X)$. The shift $b$ moves location but not spread.",
+    "hint": "Additive constant cancels in variance.",
+    "max_marks": 3
+  },
+  {
+    "id": "1.1c",
+    "topic": "1.1 Descriptive Statistics",
+    "module": 1,
+    "type": "concept",
+    "front": "How do mean, median and mode order for a <b>positively (right) skewed</b> distribution?",
+    "model_answer": "mode &lt; median &lt; mean. The long right tail pulls the mean up most. (Reversed for left/negative skew.)",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "1.1d",
+    "topic": "1.1 Descriptive Statistics",
+    "module": 1,
+    "type": "concept",
+    "front": "State the <b>1.5×IQR</b> rule for identifying outliers in a boxplot.",
+    "model_answer": "A point is a (mild) outlier if it lies below $Q_1-1.5\\,\\text{IQR}$ or above $Q_3+1.5\\,\\text{IQR}$, where $\\text{IQR}=Q_3-Q_1$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "1.2a",
+    "topic": "1.2 Correlation Analysis",
+    "module": 1,
+    "type": "formula",
+    "front": "Write the <b>Pearson</b> sample correlation coefficient $r$.",
+    "model_answer": "$r=\\dfrac{S_{xy}}{\\sqrt{S_{xx}S_{yy}}}$, where $S_{xy}=\\sum(x-\\bar x)(y-\\bar y)=\\sum xy-\\frac{(\\sum x)(\\sum y)}{n}$. Range $-1\\le r\\le 1$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "1.2b",
+    "topic": "1.2 Correlation Analysis",
+    "module": 1,
+    "type": "concept",
+    "front": "What exactly does Pearson's $r$ measure — and what is the classic trap?",
+    "model_answer": "It measures the strength of a <b>linear</b> relationship only. Trap: $r\\approx 0$ does <b>not</b> mean \"no relationship\" (could be strongly non-linear), and correlation $\\neq$ causation.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "1.2c",
+    "topic": "1.2 Correlation Analysis",
+    "module": 1,
+    "type": "concept",
+    "front": "When would you use <b>Spearman's rank</b> correlation instead of Pearson's?",
+    "model_answer": "When the relationship is monotonic but not linear, the data are ordinal, or there are outliers/non-normality. Spearman = Pearson applied to the <b>ranks</b>; robust to outliers and detects any monotonic association.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.1a",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "$X\\sim\\text{Bin}(n,p)$: mean, variance, and the situation it models.",
+    "model_answer": "$E[X]=np$, $\\mathrm{Var}(X)=np(1-p)$. Models the number of successes in $n$ independent trials with constant success probability $p$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.1b",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "$X\\sim\\text{Poi}(\\lambda)$: mean, variance, pmf. When does it approximate the Binomial?",
+    "model_answer": "$P(X=k)=\\frac{e^{-\\lambda}\\lambda^k}{k!}$, $E[X]=\\mathrm{Var}(X)=\\lambda$. Approximates $\\text{Bin}(n,p)$ when $n$ large, $p$ small, $\\lambda=np$. Models counts of rare events / claim numbers.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.1c",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "Exponential $X\\sim\\text{Exp}(\\lambda)$: pdf, mean, variance, key property.",
+    "model_answer": "$f(x)=\\lambda e^{-\\lambda x}$, $E[X]=1/\\lambda$, $\\mathrm{Var}(X)=1/\\lambda^2$. <b>Memoryless</b>: $P(X>s+t\\mid X>s)=P(X>t)$. Models waiting times between Poisson events / claim sizes.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.1d",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "Gamma $X\\sim\\text{Gamma}(\\alpha,\\lambda)$: mean, variance, and its relationships.",
+    "model_answer": "$E[X]=\\alpha/\\lambda$, $\\mathrm{Var}(X)=\\alpha/\\lambda^2$. $\\text{Gamma}(1,\\lambda)=\\text{Exp}(\\lambda)$; sum of $\\alpha$ iid $\\text{Exp}(\\lambda)$; $\\chi^2_k=\\text{Gamma}(k/2,\\tfrac12)$. Right-skewed positive — popular for claim sizes.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.1e",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "concept",
+    "front": "A claims process: what distribution for the <b>number</b> of claims vs the <b>size</b> of claims?",
+    "model_answer": "Number (counts): Poisson, or Negative Binomial if over-dispersed (variance &gt; mean). Size (positive, skewed): Exponential, Gamma, or Lognormal. Total = a compound distribution.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.1f",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "concept",
+    "front": "Using a Normal to approximate a discrete distribution — what must you remember?",
+    "model_answer": "The <b>continuity correction</b>: $P(X\\le k)\\approx P(Y\\le k+0.5)$ and $P(X\\ge k)\\approx P(Y\\ge k-0.5)$ with $Y$ normal. Forgetting it is a routine lost-mark in the examiner reports.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.1g",
+    "topic": "2.1 Univariate Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "Lognormal: if $\\ln X\\sim N(\\mu,\\sigma^2)$, what is $E[X]$?",
+    "model_answer": "$E[X]=e^{\\mu+\\sigma^2/2}$ and $\\mathrm{Var}(X)=e^{2\\mu+\\sigma^2}(e^{\\sigma^2}-1)$. Note $E[X]\\neq e^{\\mu}$ — a common slip.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.2a",
+    "topic": "2.2 Joint Distributions",
+    "module": 2,
+    "type": "concept",
+    "front": "State the condition for two random variables $X,Y$ to be <b>independent</b>.",
+    "model_answer": "Their joint factorises into marginals for all values: $f_{X,Y}(x,y)=f_X(x)f_Y(y)$ (equivalently $F_{X,Y}=F_XF_Y$). Then also $E[XY]=E[X]E[Y]$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.2b",
+    "topic": "2.2 Joint Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "Covariance: definition and computational formula.",
+    "model_answer": "$\\mathrm{Cov}(X,Y)=E[(X-\\mu_X)(Y-\\mu_Y)]=E[XY]-E[X]E[Y]$. Independence $\\Rightarrow$ $\\mathrm{Cov}=0$, but $\\mathrm{Cov}=0$ does <b>not</b> imply independence.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.2c",
+    "topic": "2.2 Joint Distributions",
+    "module": 2,
+    "type": "formula",
+    "front": "Write $\\mathrm{Var}(aX+bY)$ in full.",
+    "model_answer": "$\\mathrm{Var}(aX+bY)=a^2\\mathrm{Var}(X)+b^2\\mathrm{Var}(Y)+2ab\\,\\mathrm{Cov}(X,Y)$. If independent, the last term vanishes.",
+    "hint": "The cross term is the one people forget.",
+    "max_marks": 2
+  },
+  {
+    "id": "2.2d",
+    "topic": "2.2 Joint Distributions",
+    "module": 2,
+    "type": "concept",
+    "front": "How do you obtain a <b>marginal</b> distribution from a joint distribution?",
+    "model_answer": "Sum (discrete) or integrate (continuous) out the other variable: $f_X(x)=\\sum_y f(x,y)$ or $\\int f(x,y)\\,dy$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.3a",
+    "topic": "2.3 Expectations & Conditional Expectations",
+    "module": 2,
+    "type": "formula",
+    "front": "State the <b>law of total expectation</b> (tower rule).",
+    "model_answer": "$E[X]=E\\big[E[X\\mid Y]\\big]$. Useful for mixtures and compound distributions — condition on the variable that makes $X$ simple.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.3b",
+    "topic": "2.3 Expectations & Conditional Expectations",
+    "module": 2,
+    "type": "formula",
+    "front": "State the <b>law of total variance</b>.",
+    "model_answer": "$\\mathrm{Var}(X)=E\\big[\\mathrm{Var}(X\\mid Y)\\big]+\\mathrm{Var}\\big(E[X\\mid Y]\\big)$ &nbsp; (\"expected conditional variance + variance of conditional mean\").",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.3c",
+    "topic": "2.3 Expectations & Conditional Expectations",
+    "module": 2,
+    "type": "formula",
+    "front": "Compound distribution $S=\\sum_{i=1}^N X_i$ (claims), $N\\perp X_i$. Give $E[S]$ and $\\mathrm{Var}(S)$.",
+    "model_answer": "$E[S]=E[N]\\,E[X]$. <br>$\\mathrm{Var}(S)=E[N]\\,\\mathrm{Var}(X)+\\mathrm{Var}(N)\\,(E[X])^2$ (from the law of total variance).",
+    "hint": "Condition on N.",
+    "max_marks": 2
+  },
+  {
+    "id": "2.4a",
+    "topic": "2.4 Generating Functions",
+    "module": 2,
+    "type": "formula",
+    "front": "Define the <b>moment generating function</b> and say how you get moments from it.",
+    "model_answer": "$M_X(t)=E[e^{tX}]$. Then $E[X^k]=M_X^{(k)}(0)$ — the $k$-th derivative evaluated at $t=0$. In particular $E[X]=M'(0)$, $E[X^2]=M''(0)$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.4b",
+    "topic": "2.4 Generating Functions",
+    "module": 2,
+    "type": "concept",
+    "front": "Two key uses of the MGF for <b>sums</b> and for <b>identification</b>.",
+    "model_answer": "(1) For independent $X,Y$: $M_{X+Y}(t)=M_X(t)M_Y(t)$. (2) Uniqueness — if two variables share the same MGF (on an interval around 0) they have the same distribution, so you can identify a distribution from its MGF.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "2.4c",
+    "topic": "2.4 Generating Functions",
+    "module": 2,
+    "type": "formula",
+    "front": "Define the <b>cumulant generating function</b>; what are the first two cumulants?",
+    "model_answer": "$C_X(t)=\\ln M_X(t)$. Then $C'(0)=E[X]$ (mean) and $C''(0)=\\mathrm{Var}(X)$. Third cumulant relates to skewness.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.5a",
+    "topic": "2.5 Central Limit Theorem",
+    "module": 2,
+    "type": "concept",
+    "front": "State the Central Limit Theorem (for iid sums/means).",
+    "model_answer": "For iid $X_i$ with mean $\\mu$ and finite variance $\\sigma^2$, as $n\\to\\infty$: $\\dfrac{\\bar X-\\mu}{\\sigma/\\sqrt n}\\xrightarrow{d}N(0,1)$, i.e. $\\bar X\\approx N(\\mu,\\sigma^2/n)$ and $\\sum X_i\\approx N(n\\mu,n\\sigma^2)$.",
+    "hint": "Requires finite variance; no assumption on the shape of X.",
+    "max_marks": 3
+  },
+  {
+    "id": "2.5b",
+    "topic": "2.5 Central Limit Theorem",
+    "module": 2,
+    "type": "formula",
+    "front": "Sampling distribution of $\\bar X$: its mean and variance for any iid sample.",
+    "model_answer": "$E[\\bar X]=\\mu$ and $\\mathrm{Var}(\\bar X)=\\sigma^2/n$, so the standard error is $\\sigma/\\sqrt n$ — shrinks with $\\sqrt n$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.6a",
+    "topic": "2.6 Random Sampling",
+    "module": 2,
+    "type": "formula",
+    "front": "How is $\\chi^2_k$ built from normals, and what is the distribution of $\\frac{(n-1)S^2}{\\sigma^2}$?",
+    "model_answer": "$\\chi^2_k=\\sum_{i=1}^k Z_i^2$ with $Z_i\\sim N(0,1)$ iid. For a normal sample, $\\dfrac{(n-1)S^2}{\\sigma^2}\\sim\\chi^2_{n-1}$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.6b",
+    "topic": "2.6 Random Sampling",
+    "module": 2,
+    "type": "formula",
+    "front": "Define the <b>t</b> and <b>F</b> distributions in terms of normals / chi-squares.",
+    "model_answer": "$t_k=\\dfrac{Z}{\\sqrt{\\chi^2_k/k}}$ ($Z$ and $\\chi^2_k$ independent). $F_{m,n}=\\dfrac{\\chi^2_m/m}{\\chi^2_n/n}$. Note $t_k^2=F_{1,k}$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "2.6c",
+    "topic": "2.6 Random Sampling",
+    "module": 2,
+    "type": "formula",
+    "front": "For a normal sample, what is the distribution of $\\dfrac{\\bar X-\\mu}{S/\\sqrt n}$, and why $t$ not $Z$?",
+    "model_answer": "$\\dfrac{\\bar X-\\mu}{S/\\sqrt n}\\sim t_{n-1}$. We use $t$ because $\\sigma$ is unknown and replaced by the estimate $S$; this extra uncertainty fattens the tails. ($\\bar X$ and $S^2$ are independent for a normal sample.)",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "3.1a",
+    "topic": "3.1 Estimators",
+    "module": 3,
+    "type": "formula",
+    "front": "Define <b>bias</b> and the <b>mean squared error</b> of an estimator $\\hat\\theta$.",
+    "model_answer": "$\\text{bias}(\\hat\\theta)=E[\\hat\\theta]-\\theta$. &nbsp; $\\text{MSE}(\\hat\\theta)=E[(\\hat\\theta-\\theta)^2]=\\mathrm{Var}(\\hat\\theta)+\\text{bias}(\\hat\\theta)^2$. Unbiased $\\Rightarrow$ MSE = variance.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "3.1b",
+    "topic": "3.1 Estimators",
+    "module": 3,
+    "type": "concept",
+    "front": "Describe the <b>method of moments</b> procedure.",
+    "model_answer": "Equate population (theoretical) moments to sample moments and solve for the parameters: e.g. set $E[X]=\\bar x$ (and $E[X^2]=\\overline{x^2}$ if two parameters), then solve. Simple but generally less efficient than MLE.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.1c",
+    "topic": "3.1 Estimators",
+    "module": 3,
+    "type": "concept",
+    "front": "Describe the steps to find a <b>maximum likelihood estimator</b> (MLE).",
+    "model_answer": "1) Write the likelihood $L(\\theta)=\\prod f(x_i;\\theta)$. 2) Take logs $\\ell(\\theta)=\\ln L$. 3) Differentiate, set $\\ell'(\\theta)=0$, solve for $\\hat\\theta$. 4) Check it's a maximum ($\\ell''&lt;0$).",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.1d",
+    "topic": "3.1 Estimators",
+    "module": 3,
+    "type": "concept",
+    "front": "State the key large-sample properties of the MLE.",
+    "model_answer": "Consistent, asymptotically unbiased, asymptotically <b>normal</b>, asymptotically <b>efficient</b> (attains the Cramér–Rao bound), and <b>invariant</b>: the MLE of $g(\\theta)$ is $g(\\hat\\theta)$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.1e",
+    "topic": "3.1 Estimators",
+    "module": 3,
+    "type": "formula",
+    "front": "Fisher information and the asymptotic variance / Cramér–Rao lower bound of the MLE.",
+    "model_answer": "$I(\\theta)=-E\\!\\left[\\dfrac{d^2\\ell}{d\\theta^2}\\right]$. The CRLB for any unbiased estimator is $1/I(\\theta)$, and asymptotically $\\hat\\theta\\approx N\\!\\big(\\theta,\\,1/I(\\theta)\\big)$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "3.2a",
+    "topic": "3.2 Confidence Intervals",
+    "module": 3,
+    "type": "formula",
+    "front": "95% CI for a normal mean when $\\sigma$ is <b>known</b> vs <b>unknown</b>.",
+    "model_answer": "Known $\\sigma$: $\\bar x\\pm z_{0.975}\\,\\dfrac{\\sigma}{\\sqrt n}$ ($z=1.96$). Unknown $\\sigma$: $\\bar x\\pm t_{n-1,\\,0.975}\\,\\dfrac{s}{\\sqrt n}$. Use $t$ whenever you estimate $\\sigma$ from the sample.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "3.2b",
+    "topic": "3.2 Confidence Intervals",
+    "module": 3,
+    "type": "formula",
+    "front": "Confidence interval for a normal <b>variance</b> $\\sigma^2$.",
+    "model_answer": "$\\left(\\dfrac{(n-1)s^2}{\\chi^2_{n-1,\\,0.975}},\\;\\dfrac{(n-1)s^2}{\\chi^2_{n-1,\\,0.025}}\\right)$. Note it is <b>not</b> symmetric (chi-square is skewed), and the larger chi-square quantile goes on the bottom of the lower limit.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "3.2c",
+    "topic": "3.2 Confidence Intervals",
+    "module": 3,
+    "type": "concept",
+    "front": "What does \"95% confidence\" actually mean? (The interpretation examiners want.)",
+    "model_answer": "Over many repeated samples, 95% of the intervals constructed this way would contain the true parameter. It is <b>not</b> \"95% probability the parameter is in this particular interval\" — the parameter is fixed, the interval is random.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3a",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "Define Type I error, Type II error, and power.",
+    "model_answer": "Type I ($\\alpha$): reject $H_0$ when it is true (false positive). Type II ($\\beta$): fail to reject $H_0$ when it is false. Power $=1-\\beta$: probability of correctly rejecting a false $H_0$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3b",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "Define the <b>p-value</b> and the decision rule.",
+    "model_answer": "The p-value is the probability, <b>if $H_0$ is true</b>, of a test statistic at least as extreme as the one observed. Reject $H_0$ if p-value $&lt;\\alpha$ (the significance level). Small p $\\Rightarrow$ evidence against $H_0$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3c",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "Two-sample <b>t-test</b>: what are the assumptions, and what is \"pooled variance\"?",
+    "model_answer": "Assumes independent samples, normal populations, and (for the pooled test) equal variances. Pooled variance $s_p^2=\\dfrac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}$; test statistic $\\sim t_{n_1+n_2-2}$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3d",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "Chi-square <b>test of association</b> in a contingency table: statistic and degrees of freedom.",
+    "model_answer": "$\\chi^2=\\sum\\dfrac{(O-E)^2}{E}$ with $E=\\dfrac{\\text{row total}\\times\\text{col total}}{\\text{grand total}}$, df $=(r-1)(c-1)$. Large statistic $\\Rightarrow$ reject independence of the two factors.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3e",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "When do you use a <b>paired</b> t-test rather than a two-sample t-test?",
+    "model_answer": "When observations come in natural pairs (before/after, matched subjects). Work with the differences $d_i$ and test $H_0:\\mu_d=0$ using $\\dfrac{\\bar d}{s_d/\\sqrt n}\\sim t_{n-1}$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "3.3f",
+    "topic": "3.3 Hypothesis Testing",
+    "module": 3,
+    "type": "concept",
+    "front": "The examiner-report trap on every hypothesis test question.",
+    "model_answer": "State $H_0$ and $H_1$ explicitly, compare to the correct critical value / use the p-value, AND <b>write the conclusion in the context of the question</b> (\"there is insufficient evidence at the 5% level that the new drug reduces...\"). Marks are lost for a bare \"reject $H_0$\".",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.1a",
+    "topic": "4.1 Linear Regression",
+    "module": 4,
+    "type": "formula",
+    "front": "Least-squares estimates of slope and intercept in $y=\\alpha+\\beta x$.",
+    "model_answer": "$\\hat\\beta=\\dfrac{S_{xy}}{S_{xx}}$ and $\\hat\\alpha=\\bar y-\\hat\\beta\\bar x$. The fitted line always passes through $(\\bar x,\\bar y)$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "4.1b",
+    "topic": "4.1 Linear Regression",
+    "module": 4,
+    "type": "concept",
+    "front": "State the assumptions of the simple linear regression model.",
+    "model_answer": "<b>L</b>inearity of the mean; <b>I</b>ndependence of errors; <b>N</b>ormality of errors; <b>E</b>qual variance (homoscedasticity). Errors $\\varepsilon_i\\sim N(0,\\sigma^2)$ iid.",
+    "hint": "LINE",
+    "max_marks": 3
+  },
+  {
+    "id": "4.1c",
+    "topic": "4.1 Linear Regression",
+    "module": 4,
+    "type": "formula",
+    "front": "What is $R^2$ and how is it interpreted?",
+    "model_answer": "$R^2=\\dfrac{SS_{reg}}{SS_{tot}}=1-\\dfrac{SS_{res}}{SS_{tot}}$ = proportion of variance in $y$ explained by the model. In simple regression $R^2=r^2$.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "4.1d",
+    "topic": "4.1 Linear Regression",
+    "module": 4,
+    "type": "concept",
+    "front": "Difference between a <b>confidence interval for the mean response</b> and a <b>prediction interval</b>.",
+    "model_answer": "Both are centred on $\\hat y_0$. The CI for the mean response estimates $E[y\\mid x_0]$. The prediction interval is for a single new observation and is <b>wider</b> because it adds the individual error variance $\\sigma^2$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.1e",
+    "topic": "4.1 Linear Regression",
+    "module": 4,
+    "type": "concept",
+    "front": "How do you test whether the slope is significant, and what do residual plots check?",
+    "model_answer": "Test $H_0:\\beta=0$ with $t=\\hat\\beta/\\text{se}(\\hat\\beta)\\sim t_{n-2}$. Residual plots check the LINE assumptions: residuals vs fitted (linearity/equal variance), Q-Q plot (normality), no pattern/autocorrelation.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.2a",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "front": "State the <b>three components</b> of a generalised linear model.",
+    "model_answer": "1) <b>Random component</b>: response from the exponential family (Normal, Poisson, Binomial, Gamma...). 2) <b>Systematic component</b>: linear predictor $\\eta=\\sum\\beta_j x_j$. 3) <b>Link function</b> $g$ connecting them: $g(\\mu)=\\eta$.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.2b",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "front": "Give the canonical link functions for Normal, Poisson and Binomial responses.",
+    "model_answer": "Normal → identity $g(\\mu)=\\mu$. Poisson → log $g(\\mu)=\\ln\\mu$. Binomial → logit $g(\\mu)=\\ln\\frac{\\mu}{1-\\mu}$. Gamma → reciprocal (often log used in practice).",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.2c",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "front": "What is the <b>deviance</b> and how is it used?",
+    "model_answer": "Deviance $=2\\big(\\ell_{saturated}-\\ell_{model}\\big)$ — a measure of lack of fit (smaller = better). For <b>nested</b> models, the difference in (scaled) deviance is $\\approx\\chi^2_{\\Delta p}$, giving a test of whether extra parameters improve fit.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.2d",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "formula",
+    "front": "Define <b>AIC</b> and how to use it for model comparison.",
+    "model_answer": "$\\text{AIC}=-2\\ell+2p$ ($\\ell$ = max log-likelihood, $p$ = number of parameters). <b>Lower AIC is better</b>; it rewards fit but penalises complexity. Unlike the deviance test, AIC can compare <b>non-nested</b> models.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "4.2e",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "front": "Which GLM family would you pick for: claim counts; a 0/1 (or proportion) outcome; positive skewed claim amounts?",
+    "model_answer": "Counts → Poisson (log link). Binary/proportion → Binomial (logit link, i.e. logistic regression). Positive skewed amounts → Gamma (log or reciprocal link).",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "4.2f",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "front": "Pearson vs deviance residuals — and the GLM trap.",
+    "model_answer": "Both standardise the gap between observed and fitted; deviance residuals sum to the deviance and are usually preferred for diagnostics. Trap: the deviance difference test is valid only for <b>nested</b> models — use AIC for non-nested comparisons.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "5.1a",
+    "topic": "5.1 Bayesian & Credibility",
+    "module": 5,
+    "type": "formula",
+    "front": "State Bayes' theorem in the prior/likelihood/posterior form.",
+    "model_answer": "$\\underbrace{f(\\theta\\mid x)}_{\\text{posterior}}=\\dfrac{f(x\\mid\\theta)\\,f(\\theta)}{f(x)}\\;\\propto\\;\\underbrace{f(x\\mid\\theta)}_{\\text{likelihood}}\\;\\underbrace{f(\\theta)}_{\\text{prior}}$. The denominator is just a normalising constant.",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "5.1b",
+    "topic": "5.1 Bayesian & Credibility",
+    "module": 5,
+    "type": "concept",
+    "front": "What is a <b>conjugate prior</b>? Give the three classic pairs.",
+    "model_answer": "A prior is conjugate if the posterior is in the same family. Classics: Beta prior + Binomial likelihood → Beta posterior; Gamma prior + Poisson → Gamma; Normal prior + Normal (known var) → Normal.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "5.1c",
+    "topic": "5.1 Bayesian & Credibility",
+    "module": 5,
+    "type": "concept",
+    "front": "Bayesian point estimate: which summary of the posterior minimises which loss function?",
+    "model_answer": "Quadratic (squared-error) loss → posterior <b>mean</b>. Absolute-error loss → posterior <b>median</b>. All-or-nothing (0/1) loss → posterior <b>mode</b>.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "5.1d",
+    "topic": "5.1 Bayesian & Credibility",
+    "module": 5,
+    "type": "formula",
+    "front": "Write the credibility estimate of the premium and interpret $Z$.",
+    "model_answer": "Credibility estimate $=Z\\,\\bar X+(1-Z)\\,\\mu$, a weighted average of the data mean $\\bar X$ and the prior/collective mean $\\mu$. $Z\\in[0,1]$ is the <b>credibility factor</b> — it increases with more data (larger $n$).",
+    "hint": null,
+    "max_marks": 2
+  },
+  {
+    "id": "5.1e",
+    "topic": "5.1 Bayesian & Credibility",
+    "module": 5,
+    "type": "concept",
+    "front": "How does the Bayesian posterior mean relate to credibility theory?",
+    "model_answer": "Under the standard conjugate models the posterior mean takes exactly the credibility form $Z\\bar X+(1-Z)\\mu$. So Bayesian estimation provides the theoretical foundation for credibility premiums; EBCT estimates $Z$ from data when prior parameters are unknown.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r01",
+    "topic": "R · Data & summaries",
+    "module": 1,
+    "type": "r",
+    "front": "Load a supplied <code class=\"inline\">.RData</code> file and get summary statistics for a variable <code class=\"inline\">claims</code>.",
+    "model_answer": "<pre>load(\"ClaimsData.RData\")   # objects appear in workspace\nls()                       # see what was loaded\nsummary(claims)            # min, Q1, median, mean, Q3, max\nmean(claims); sd(claims); var(claims)\nquantile(claims, c(0.25, 0.75))</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r02",
+    "topic": "R · Distributions",
+    "module": 2,
+    "type": "r",
+    "front": "The four distribution-function prefixes in R, with a Poisson example.",
+    "model_answer": "<pre># d=density/pmf  p=cdf  q=quantile  r=random\ndpois(3, lambda=2)       # P(X = 3)\nppois(3, lambda=2)       # P(X <= 3)\nqpois(0.95, lambda=2)    # 95th percentile\nrpois(100, lambda=2)     # 100 simulated values\n# same pattern: dnorm/pnorm/qnorm/rnorm, dexp..., dgamma..., dbinom...</pre>",
+    "hint": "d / p / q / r",
+    "max_marks": 3
+  },
+  {
+    "id": "r03",
+    "topic": "R · Distributions",
+    "module": 2,
+    "type": "r",
+    "front": "Compute $P(X\\le 8)$ for $X\\sim N(10,2^2)$ and the value with 2.5% in the upper tail.",
+    "model_answer": "<pre>pnorm(8, mean=10, sd=2)        # note sd, NOT variance\nqnorm(0.975, mean=10, sd=2)    # upper 2.5% point</pre><div class=\"trap\">Trap: R uses <b>sd</b>, not variance. Passing the variance is a classic CS1B error.</div>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r04",
+    "topic": "R · Hypothesis tests",
+    "module": 3,
+    "type": "r",
+    "front": "One-sample and two-sample <b>t-tests</b> in R, including interpreting output.",
+    "model_answer": "<pre>t.test(x, mu=100)                 # H0: mean = 100\nt.test(x, y)                      # Welch two-sample (unequal var)\nt.test(x, y, var.equal=TRUE)      # pooled two-sample\nt.test(before, after, paired=TRUE)# paired</pre>Read off the p-value and confidence interval, then <b>state the conclusion in context</b>.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r05",
+    "topic": "R · Hypothesis tests",
+    "module": 3,
+    "type": "r",
+    "front": "Test equality of two variances (F-test) and a chi-square goodness-of-fit test.",
+    "model_answer": "<pre>var.test(x, y)                    # F-test, H0: var1 = var2\nchisq.test(observed, p=expected_probs)   # goodness of fit\nchisq.test(table(factorA, factorB))      # association (contingency)</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r06",
+    "topic": "R · Regression",
+    "module": 4,
+    "type": "r",
+    "front": "Fit a simple linear regression, view results, and predict.",
+    "model_answer": "<pre>fit <- lm(y ~ x, data=df)\nsummary(fit)              # coefficients, p-values, R-squared\nconfint(fit)             # CIs for coefficients\npredict(fit, newdata=data.frame(x=5),\n        interval=\"prediction\")   # or \"confidence\"\ncoef(fit); resid(fit); fitted(fit)</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r07",
+    "topic": "R · Regression",
+    "module": 4,
+    "type": "r",
+    "front": "Diagnostic / residual plots for a fitted <code class=\"inline\">lm</code> model.",
+    "model_answer": "<pre>par(mfrow=c(2,2)); plot(fit)   # 4 standard diagnostics\n# or individually:\nplot(fitted(fit), resid(fit)); abline(h=0)\nqqnorm(resid(fit)); qqline(resid(fit))</pre>Comment on linearity, equal variance and normality from these.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r08",
+    "topic": "R · GLMs",
+    "module": 4,
+    "type": "r",
+    "front": "Fit a <b>Poisson</b> GLM and a <b>logistic</b> GLM, and compare models.",
+    "model_answer": "<pre>m1 <- glm(count ~ x1 + x2, family=poisson(link=\"log\"), data=df)\nm2 <- glm(y ~ x1, family=binomial(link=\"logit\"), data=df)  # logistic\nsummary(m1)              # estimates, deviance, AIC\nAIC(m1, m2)              # compare (lower = better)\nanova(m_small, m_big, test=\"Chisq\")   # nested deviance test</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r09",
+    "topic": "R · Correlation",
+    "module": 1,
+    "type": "r",
+    "front": "Compute a correlation and test whether it is significant.",
+    "model_answer": "<pre>cor(x, y)                          # Pearson by default\ncor(x, y, method=\"spearman\")       # rank correlation\ncor.test(x, y)                     # gives p-value and CI</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r10",
+    "topic": "R · Simulation",
+    "module": 2,
+    "type": "r",
+    "front": "Reproducibly simulate, and estimate a probability by simulation.",
+    "model_answer": "<pre>set.seed(42)                        # reproducibility — always set it\nsims <- replicate(10000, mean(rexp(50, rate=0.2)))\nmean(sims > 6)                      # estimated P(mean > 6)\nsample(1:6, 10, replace=TRUE)       # sampling with replacement</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r11",
+    "topic": "R · Plots",
+    "module": 1,
+    "type": "r",
+    "front": "Quick exploratory plots: histogram, boxplot, scatter.",
+    "model_answer": "<pre>hist(x, breaks=20, main=\"\", xlab=\"claims\")\nboxplot(y ~ group)                 # compare groups\nplot(x, y)                          # scatter\nabline(lm(y ~ x), col=\"red\")        # add fitted line</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r12",
+    "topic": "R · Estimation",
+    "module": 3,
+    "type": "r",
+    "front": "Fit a distribution by maximum likelihood in R.",
+    "model_answer": "<pre>library(MASS)\nfitdistr(x, \"gamma\")     # MLE estimates + standard errors\nfitdistr(x, \"exponential\")\n# method of moments (gamma example):\nm <- mean(x); v <- var(x)\nalpha_hat <- m^2/v ; lambda_hat <- m/v</pre>",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r13",
+    "topic": "R · Confidence intervals",
+    "module": 3,
+    "type": "r",
+    "front": "Build a 95% confidence interval for a mean <b>manually</b> in R.",
+    "model_answer": "<pre>n <- length(x); xbar <- mean(x); s <- sd(x)\ntcrit <- qt(0.975, df=n-1)\nxbar + c(-1,1) * tcrit * s/sqrt(n)</pre>Useful when the question wants the working, not just <code class=\"inline\">t.test</code>.",
+    "hint": null,
+    "max_marks": 3
+  },
+  {
+    "id": "r14",
+    "topic": "R · Bayesian",
+    "module": 5,
+    "type": "r",
+    "front": "Compute a posterior under Gamma–Poisson conjugacy in R.",
+    "model_answer": "<pre># Prior Gamma(a,b); observe counts y (n obs)\na <- 2; b <- 1\npost_a <- a + sum(y)\npost_b <- b + length(y)\npost_mean <- post_a / post_b      # posterior mean of lambda\nqgamma(c(0.025,0.975), post_a, post_b)  # 95% credible interval</pre>",
+    "hint": null,
+    "max_marks": 3
+  }
+]
