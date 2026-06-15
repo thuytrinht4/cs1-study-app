@@ -1,0 +1,141 @@
+[
+  {
+    "id": "EX-1.1-2",
+    "topic": "1.1 Descriptive statistics",
+    "module": 1,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "mean = Σx/n; median = middle value; s² = Σ(x−x̄)²/(n−1); mean > median ⇒ right skew.",
+    "front": "A sample of 7 claim amounts (£000s) is: 2, 4, 4, 5, 7, 9, 11.\n\n(i) Calculate the sample mean and median. **[2]**\n(ii) Calculate the sample variance (n−1 divisor) and standard deviation. **[3]**\n(iii) State whether the data appear skewed, with a reason. **[1]**",
+    "model_answer": "**Approach:** mean = Σx/n; median = middle ordered value; s² = Σ(x−x̄)²/(n−1); compare mean and median for skew.\n\n**Solution:**\n(i) Mean = 42/7 = 6. Median = 5 (the 4th of 7 ordered values).\n(ii) Deviations from 6: −4, −2, −2, −1, 1, 3, 5; their squares 16, 4, 4, 1, 1, 9, 25 sum to 60. s² = 60/(7−1) = 10, so s = √10 = 3.16.\n(iii) Mean (6) > median (5), so the data are slightly positively (right) skewed.",
+    "mark_scheme": [
+      {"point": "Mean = 6", "marks": 1},
+      {"point": "Median = 5", "marks": 1},
+      {"point": "Σ(x−x̄)² = 60", "marks": 1},
+      {"point": "s² = 10", "marks": 1},
+      {"point": "s = 3.16", "marks": 1},
+      {"point": "Right skew because mean > median", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.1-3",
+    "topic": "1.1 Descriptive statistics",
+    "module": 1,
+    "type": "r",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "quantile / IQR for spread; boxplot for shape & outliers; logical-sum to count outliers.",
+    "front": "(CS1B / R) Claim amounts are in a numeric vector `x`.\n\n(i) Write R to obtain the quartiles and the interquartile range. **[2]**\n(ii) Write R to draw a boxplot and say what it reveals. **[2]**\n(iii) Write R to count values beyond 1.5×IQR above Q3. **[1]**",
+    "model_answer": "**Approach:** `quantile`/`IQR` for spread; `boxplot` for shape and outliers; a logical sum counts outliers.\n\n**Solution:**\n(i)\n```r\nquantile(x)            # min, Q1, median, Q3, max\nIQR(x)                 # Q3 - Q1\n```\n(ii)\n```r\nboxplot(x)\n```\nThe box shows the median and IQR; the whiskers and any plotted points reveal the spread, skew and outliers.\n(iii)\n```r\nsum(x > quantile(x, 0.75) + 1.5 * IQR(x))\n```",
+    "mark_scheme": [
+      {"point": "quantile(x) and IQR(x)", "marks": 2},
+      {"point": "boxplot(x) + what it reveals", "marks": 2},
+      {"point": "sum(x > Q3 + 1.5*IQR)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.1-4",
+    "topic": "1.1 Descriptive statistics",
+    "module": 1,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "sd is in the data's units; +c shifts mean only; ×a scales mean by a and sd by |a|.",
+    "front": "(i) Define the sample standard deviation and explain why it is often preferred to the variance for reporting. **[2]**\n(ii) Explain the effect on the mean and standard deviation of (a) adding a constant c to every value, and (b) multiplying every value by a. **[3]**",
+    "model_answer": "**Approach:** Recall the units argument and the location/scale transformation rules.\n\n**Solution:**\n(i) The standard deviation is the square root of the variance, s = √s². It is preferred for reporting because it is in the **same units** as the data, whereas the variance is in squared units.\n(ii) (a) Adding c: the mean increases by c; the standard deviation is **unchanged** (a shift does not affect spread). (b) Multiplying by a: the mean is multiplied by a; the standard deviation is multiplied by |a| (and the variance by a²).",
+    "mark_scheme": [
+      {"point": "s = √(variance)", "marks": 1},
+      {"point": "Preferred: same units as the data", "marks": 1},
+      {"point": "+c: mean +c, sd unchanged", "marks": 1},
+      {"point": "×a: mean ×a", "marks": 1},
+      {"point": "×a: sd ×|a|", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.2-1",
+    "topic": "1.2 Data analysis & correlation",
+    "module": 1,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Pearson = linear, in [−1,1]; Spearman = ranks (monotonic/ordinal/outliers).",
+    "front": "(i) Define the Pearson correlation coefficient and state its range. **[2]**\n(ii) State when Spearman's rank correlation is preferred to Pearson's. **[2]**\n(iii) State one limitation common to both. **[1]**",
+    "model_answer": "**Approach:** Recall the definitions, assumptions and shared limitation of the two correlation measures.\n\n**Solution:**\n(i) Pearson's r = Cov(X,Y)/(σ_X σ_Y) (sample form S_xy/√(S_xx S_yy)); it measures **linear** association and lies in [−1, 1].\n(ii) Spearman's (rank) correlation is preferred when the relationship is monotonic but non-linear, when the data are ordinal, or when there are outliers / non-Normality — working on ranks makes it more robust.\n(iii) Neither implies causation, and both can miss a strong non-monotonic relationship (e.g. a U-shape can give r ≈ 0).",
+    "mark_scheme": [
+      {"point": "Pearson r = Cov/(σ_X σ_Y), measures linear association", "marks": 1},
+      {"point": "Range [−1, 1]", "marks": 1},
+      {"point": "Spearman for monotonic/ordinal/outliers (ranks)", "marks": 2},
+      {"point": "Shared limitation (causation / non-monotonic)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.2-2",
+    "topic": "1.2 Data analysis & correlation",
+    "module": 1,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "S_xx = Σx² − (Σx)²/n etc.; r = S_xy/√(S_xx S_yy).",
+    "front": "For paired data: Σx = 30, Σy = 40, Σx² = 220, Σy² = 360, Σxy = 270, n = 5.\n\n(i) Calculate S_xx, S_yy and S_xy. **[3]**\n(ii) Calculate the Pearson correlation coefficient. **[2]**\n(iii) Interpret it. **[1]**",
+    "model_answer": "**Approach:** S_xx = Σx² − (Σx)²/n (and similarly S_yy, S_xy); r = S_xy/√(S_xx S_yy).\n\n**Solution:**\n(i) S_xx = 220 − 30²/5 = 220 − 180 = 40. S_yy = 360 − 40²/5 = 360 − 320 = 40. S_xy = 270 − (30·40)/5 = 270 − 240 = 30.\n(ii) r = S_xy/√(S_xx S_yy) = 30/√(40·40) = 30/40 = 0.75.\n(iii) A fairly strong positive linear association between x and y.",
+    "mark_scheme": [
+      {"point": "S_xx = 40", "marks": 1},
+      {"point": "S_yy = 40", "marks": 1},
+      {"point": "S_xy = 30", "marks": 1},
+      {"point": "r = 0.75", "marks": 2},
+      {"point": "Interpretation (strong positive linear)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.2-3",
+    "topic": "1.2 Data analysis & correlation",
+    "module": 1,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Grouped mean uses class midpoints; modal class = highest frequency; median class holds the middle value.",
+    "front": "Claims are grouped: [0, 10): 8 claims; [10, 20): 12; [20, 30): 5.\n\n(i) Estimate the mean claim using midpoints. **[2]**\n(ii) State one reason the grouped-data mean is only an approximation. **[1]**\n(iii) Identify the modal class and the class containing the median. **[2]**",
+    "model_answer": "**Approach:** Use class midpoints for the mean; modal class = highest frequency; the median class contains the middle (here 13th of 25) value.\n\n**Solution:**\n(i) Midpoints 5, 15, 25; mean ≈ (8·5 + 12·15 + 5·25)/25 = 345/25 = 13.8.\n(ii) It assumes every observation lies at its class midpoint, which is only approximate.\n(iii) Modal class = [10, 20) (highest frequency, 12). With n = 25 the median is the 13th value; cumulative frequencies are 8 then 20, so the median lies in [10, 20).",
+    "mark_scheme": [
+      {"point": "Uses midpoints 5, 15, 25", "marks": 1},
+      {"point": "Mean = 13.8", "marks": 1},
+      {"point": "Approximation: values assumed at midpoints", "marks": 1},
+      {"point": "Modal class [10, 20)", "marks": 1},
+      {"point": "Median class [10, 20)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.2-2",
+    "topic": "2.2 Joint distributions & conditional expectation",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Cov = E[XY] − E[X]E[Y]; corr = Cov/√(VarX·VarY); Var(X+Y) = VarX + VarY + 2Cov.",
+    "front": "Random variables X and Y have E[X] = 1, E[Y] = 2, E[XY] = 3, Var(X) = 2, Var(Y) = 5.\n\n(i) Calculate Cov(X, Y). **[2]**\n(ii) Calculate the correlation coefficient. **[2]**\n(iii) Calculate Var(X + Y). **[2]**",
+    "model_answer": "**Approach:** Cov(X,Y) = E[XY] − E[X]E[Y]; corr = Cov/√(VarX·VarY); Var(X+Y) = VarX + VarY + 2Cov(X,Y).\n\n**Solution:**\n(i) Cov(X,Y) = E[XY] − E[X]E[Y] = 3 − 1·2 = 1.\n(ii) corr = 1/√(2·5) = 1/√10 = 0.316.\n(iii) Var(X+Y) = 2 + 5 + 2·1 = 9.",
+    "mark_scheme": [
+      {"point": "Cov(X,Y) = 1", "marks": 2},
+      {"point": "corr = 1/√10 = 0.316", "marks": 2},
+      {"point": "Var(X+Y) = 9", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-4.3-2",
+    "topic": "4.3 Correlation & ANOVA",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "ANOVA tests equality of ≥3 means; assumptions independence/Normality/equal variance; equivalent to regression on a factor.",
+    "front": "(i) State the purpose of one-way ANOVA and its null hypothesis. **[2]**\n(ii) State the assumptions of one-way ANOVA. **[2]**\n(iii) Explain how ANOVA relates to a regression with a categorical predictor. **[1]**",
+    "model_answer": "**Approach:** Recall ANOVA's purpose, assumptions, and its equivalence to regression on dummy variables.\n\n**Solution:**\n(i) One-way ANOVA tests whether the means of three or more groups are equal; H₀: μ₁ = μ₂ = … = μ_k.\n(ii) Observations are independent; Normally distributed within each group; with equal variance across groups (homoscedasticity).\n(iii) One-way ANOVA is equivalent to a linear regression using the group as a categorical predictor (dummy variables); the regression F-test for the factor is the ANOVA F-test.",
+    "mark_scheme": [
+      {"point": "Purpose: compare ≥3 group means", "marks": 1},
+      {"point": "H₀: all group means equal", "marks": 1},
+      {"point": "Assumptions: independent, Normal, equal variance", "marks": 2},
+      {"point": "Equivalent to regression on a categorical predictor", "marks": 1}
+    ]
+  }
+]

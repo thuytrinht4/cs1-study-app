@@ -101,6 +101,40 @@ def grade_answer(card: dict, answer_text: str) -> dict:
     raise RuntimeError("Claude did not return a structured mark.")
 
 
+TUTOR_SYSTEM = (
+    "You are a patient, precise IFoA CS1 tutor. The student has just answered an exam-style "
+    "question and seen the mark. Answer their follow-up about the question, their answer, or the "
+    "underlying concept. Be concise and correct; treat the model answer and mark scheme as ground "
+    "truth. Show working or a short derivation where it helps, and point out the exam technique "
+    "examiners reward (state H0/H1, conclude in context, comment on R output). If they ask for an "
+    "R snippet, give correct R."
+)
+
+
+def followup_answer(card: dict, answer_text: str, grade: dict,
+                    question: str, history: list | None = None) -> str:
+    """Tutor-style reply to a follow-up question about a card (Haiku, cheap)."""
+    ctx = f"QUESTION:\n{card.get('front', '')}\n\nMODEL ANSWER:\n{card.get('model_answer', '')}\n\n"
+    if card.get("mark_scheme"):
+        ctx += "MARK SCHEME:\n" + str(card["mark_scheme"]) + "\n\n"
+    if (answer_text or "").strip():
+        ctx += f"STUDENT'S ANSWER:\n{answer_text.strip()}\n\n"
+    if grade and grade.get("feedback"):
+        ctx += f"EXAMINER FEEDBACK:\n{grade.get('feedback')}\n\n"
+    messages = []
+    for qa in (history or []):
+        messages.append({"role": "user", "content": qa["q"]})
+        messages.append({"role": "assistant", "content": qa["a"]})
+    messages.append({"role": "user", "content": question.strip()})
+    msg = _get_client().messages.create(
+        model=config.MODEL_MARKER,
+        max_tokens=700,
+        system=TUTOR_SYSTEM + "\n\nCONTEXT FOR THIS QUESTION:\n" + ctx,
+        messages=messages,
+    )
+    return "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
+
+
 # ====================================================================
 #  M3 — weak-pattern detection & targeted follow-up generation (Sonnet)
 # ====================================================================

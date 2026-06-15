@@ -119,7 +119,8 @@ deck_name = st.selectbox("Deck", list(DECKS.keys()) + [TODAY_EXAM])
 RESET_KEYS = ["queue", "cards_by_id", "states", "session_id", "session_start",
               "done", "revealed", "shown_at", "grade_result", "answer_text",
               "session_points", "session_good", "pts_today_base", "goal",
-              "focus_topics", "goal_celebrated", "deck_note", "sched_label"]
+              "focus_topics", "goal_celebrated", "deck_note", "sched_label",
+              "followup_chat"]
 if st.session_state.get("deck_name") != deck_name:
     for k in RESET_KEYS:
         st.session_state.pop(k, None)
@@ -149,6 +150,7 @@ if "queue" not in st.session_state:
     st.session_state["shown_at"] = time.time()
     st.session_state["grade_result"] = None
     st.session_state["answer_text"] = ""
+    st.session_state["followup_chat"] = []
 
 queue = st.session_state["queue"]
 
@@ -255,6 +257,31 @@ def render_mark_scheme(card):
                 st.markdown(f"- {item}")
 
 
+def render_followup(card):
+    """Let the user ask Claude follow-up questions about this card (Deep mode)."""
+    if not ai.available():
+        return
+    st.divider()
+    st.markdown("**💬 Ask Claude a follow-up** (about this question, your answer, or the concept)")
+    chat = st.session_state.get("followup_chat", [])
+    for qa in chat:
+        st.markdown(f"🧑 **You:** {qa['q']}")
+        st.markdown(f"🤖 **Claude:** {qa['a']}")
+    q = st.text_input("Your follow-up question:", key=f"fu_{card['id']}_{len(chat)}",
+                      placeholder="e.g. Why do we use n−1, not n? / Show the R for this.")
+    if st.button("Ask", key=f"ask_{card['id']}_{len(chat)}"):
+        if q.strip():
+            with st.spinner("Claude is answering…"):
+                try:
+                    a = ai.followup_answer(card, st.session_state.get("answer_text", ""),
+                                           st.session_state.get("grade_result") or {}, q, chat)
+                    chat.append({"q": q, "a": a})
+                    st.session_state["followup_chat"] = chat
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Follow-up failed: {e}")
+
+
 def advance(requeue_id=None, gap=0):
     """Drop the current card; if requeue_id is given, re-insert it `gap` cards
     later so a failed card comes back THIS session (Anki-style learning steps)."""
@@ -267,6 +294,7 @@ def advance(requeue_id=None, gap=0):
     st.session_state["shown_at"] = time.time()
     st.session_state["grade_result"] = None
     st.session_state["answer_text"] = ""
+    st.session_state["followup_chat"] = []
     st.rerun()
 
 
@@ -342,6 +370,7 @@ if deep:
         st.markdown("**Model answer**")
         st.markdown(card["model_answer"], unsafe_allow_html=True)
         render_mark_scheme(card)
+        render_followup(card)
         st.divider()
         grade_buttons(suggested=gr.get("suggested_rating"))
 
@@ -356,5 +385,6 @@ else:
         st.markdown("**Model answer**")
         st.markdown(card["model_answer"], unsafe_allow_html=True)
         render_mark_scheme(card)
+        render_followup(card)
         st.divider()
         grade_buttons()
