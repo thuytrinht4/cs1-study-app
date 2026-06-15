@@ -41,6 +41,7 @@ ai_on = ai.available()
 mode = st.sidebar.radio(
     "Study mode",
     ["Fast (self-grade)", "Deep (AI marking)"],
+    index=1,  # default to Deep (AI marking)
     help="Deep mode lets you type an answer and have Claude mark it. "
          "Requires an Anthropic API key (Milestone M2).",
 )
@@ -115,7 +116,7 @@ def build_queue(deck_name):
 
 
 # ---------------------------------------------------------------- init / deck change
-deck_name = st.selectbox("Deck", list(DECKS.keys()) + [TODAY_EXAM])
+deck_name = st.selectbox("Deck", [TODAY_EXAM] + list(DECKS.keys()))
 RESET_KEYS = ["queue", "cards_by_id", "states", "session_id", "session_start",
               "done", "revealed", "shown_at", "grade_result", "answer_text",
               "session_points", "session_good", "pts_today_base", "goal",
