@@ -18,8 +18,8 @@ auth.logout_button()
 st.title("Study")
 
 DECKS = {
-    "All cards": lambda c: True,
     "Exam-style questions": lambda c: c.get("source") == "exam",
+    "All cards": lambda c: True,
     "CS1A theory only": lambda c: c["type"] != "r",
     "CS1B R code only": lambda c: c["type"] == "r",
     "Module 1 - Data analysis": lambda c: c["module"] == 1 and c["type"] != "r",
@@ -61,15 +61,30 @@ def build_queue(deck_name):
     PR0 = progress.compute(cards, states, reviews, answers)  # today's points baseline
     cards_by_id = {c["id"]: c for c in cards}
 
+    now = datetime.now(timezone.utc)
+
+    def due_or_new(c):
+        s = states.get(c["id"])
+        return s is None or datetime.fromisoformat(s["due"]) <= now
+
     # today's focus = topics/modules of the cards due or about to be introduced
     focus_ids = list(P["due_ids"]) + P["unseen_ids"][:max(P["new_remaining_target"], 1)]
     today_modules = {cards_by_id[i].get("module") for i in focus_ids if i in cards_by_id}
     today_topics = sorted({cards_by_id[i]["topic"] for i in focus_ids if i in cards_by_id})
 
+    note = None
     if deck_name == TODAY_EXAM:
-        # exam-style questions from the module(s) you're revising today (uncapped)
-        def deck_fn(c):
-            return c.get("source") == "exam" and c.get("module") in today_modules
+        in_focus = [c for c in cards if c.get("source") == "exam"
+                    and c.get("module") in today_modules]
+        if any(due_or_new(c) for c in in_focus):
+            def deck_fn(c):
+                return c.get("source") == "exam" and c.get("module") in today_modules
+        else:
+            # no exam Qs available for today's focus modules → show all exam Qs
+            def deck_fn(c):
+                return c.get("source") == "exam"
+            note = ("No exam questions for today's focus module(s) yet — showing all your "
+                    "exam questions instead. (Import more / generate one on the Home page.)")
         new_limit = 999
     else:
         deck_fn = DECKS[deck_name]
@@ -79,19 +94,22 @@ def build_queue(deck_name):
         else:
             new_limit = P["new_remaining_cap"]
 
-    now = datetime.now(timezone.utc)
     due, new = [], []
     for c in cards:
         if not deck_fn(c):
             continue
-        s = states.get(c["id"])
-        if s is None:
+        if states.get(c["id"]) is None:
             new.append(c)
-        elif datetime.fromisoformat(s["due"]) <= now:
+        elif datetime.fromisoformat(states[c["id"]]["due"]) <= now:
             due.append(c)
     new.sort(key=lambda c: (c.get("module") or 99, str(c.get("id"))))
-    extras = {"today_topics": today_topics, "pts_today_base": PR0["points_today"], "goal": PR0["goal"]}
-    return due + new[:new_limit], states, P, extras
+    queue_cards = due + new[:new_limit]
+    # for the exam decks, show the topics actually being studied in the HUD
+    if deck_name in (TODAY_EXAM, "Exam-style questions") and queue_cards:
+        today_topics = sorted({c["topic"] for c in queue_cards})
+    extras = {"today_topics": today_topics, "pts_today_base": PR0["points_today"],
+              "goal": PR0["goal"], "note": note}
+    return queue_cards, states, P, extras
 
 
 # ---------------------------------------------------------------- init / deck change
@@ -99,7 +117,7 @@ deck_name = st.selectbox("Deck", list(DECKS.keys()) + [TODAY_EXAM])
 RESET_KEYS = ["queue", "cards_by_id", "states", "session_id", "session_start",
               "done", "revealed", "shown_at", "grade_result", "answer_text",
               "session_points", "session_good", "pts_today_base", "goal",
-              "focus_topics", "goal_celebrated"]
+              "focus_topics", "goal_celebrated", "deck_note"]
 if st.session_state.get("deck_name") != deck_name:
     for k in RESET_KEYS:
         st.session_state.pop(k, None)
@@ -122,6 +140,7 @@ if "queue" not in st.session_state:
     st.session_state["pts_today_base"] = extras["pts_today_base"]
     st.session_state["goal"] = extras["goal"]
     st.session_state["focus_topics"] = extras["today_topics"]
+    st.session_state["deck_note"] = extras.get("note")
     st.session_state.pop("goal_celebrated", None)
     st.session_state["revealed"] = False
     st.session_state["shown_at"] = time.time()
@@ -135,6 +154,19 @@ if not queue:
     mins = (time.time() - st.session_state.get("session_start", time.time())) / 60
     db.end_session(st.session_state.get("session_id"),
                    int(mins * 60_000), st.session_state.get("done", 0))
+    if st.session_state.get("deck_note"):
+        st.info(st.session_state["deck_note"])
+    if st.session_state.get("done", 0) == 0:
+        # the deck was empty to begin with — not a completed session
+        st.warning("No cards to study in this deck right now. "
+                   "If you want exam questions, make sure you've imported them on the "
+                   "**Home** page (click *Import / update exam questions* — there are new "
+                   "ones available), or pick another deck above.")
+        if st.button("🔄 Rebuild queue"):
+            for k in RESET_KEYS:
+                st.session_state.pop(k, None)
+            st.rerun()
+        st.stop()
     st.success(f"Done! {st.session_state.get('done', 0)} answers · "
                f"{st.session_state.get('session_good', 0)} Good/Easy · "
                f"+{st.session_state.get('session_points', 0)} points · {mins:.0f} min.")
@@ -166,6 +198,8 @@ if not queue:
 
 # ---------------------------------------------------------------- progress HUD (game)
 def render_status():
+    if st.session_state.get("deck_note"):
+        st.caption("ℹ️ " + st.session_state["deck_note"])
     focus = st.session_state.get("focus_topics", [])
     if focus:
         st.markdown("🎯 **Today's focus:** " + "  ·  ".join(focus[:4]))
