@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 import streamlit as st
 
-from cs1 import db, scheduler, auth, ai, plan
+from cs1 import db, scheduler, auth, ai, plan, coach
 
 st.set_page_config(page_title="Study - CS1", page_icon="📚", layout="centered")
 uid = auth.require_login()
@@ -103,6 +103,15 @@ if not queue:
                    int(mins * 60_000), st.session_state.get("done", 0))
     st.success(f"Done! {st.session_state.get('done', 0)} cards in {mins:.0f} min.")
     st.balloons()
+    # auto-refresh weak areas once per session (only if new Deep-mode answers exist)
+    sid = st.session_state.get("session_id")
+    if ai.available() and st.session_state.get("autorun_for") != sid:
+        st.session_state["autorun_for"] = sid
+        with st.spinner("Updating your weak areas from this session…"):
+            out = coach.maybe_autorun(uid)
+        if out:
+            st.success(f"🎯 Weak areas refreshed — {len(out['result'].get('patterns', []))} "
+                       f"pattern(s), {out['followups']} new targeted card(s).")
     snap = st.session_state.get("plan_snapshot", {})
     if (deck_name != "Targeted follow-ups (AI)" and snap.get("new_remaining_cap") == 0
             and snap.get("unseen", 0) > 0):

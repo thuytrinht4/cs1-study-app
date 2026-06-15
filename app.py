@@ -45,6 +45,7 @@ profile = db.ensure_profile(uid)
 cards = db.get_cards(uid)
 states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
+answers = db.get_answers(uid)
 P = plan.compute(profile, cards, states, reviews)
 
 cards_by_id = {c["id"]: c for c in cards}
@@ -91,11 +92,19 @@ m4.metric("Topics not started", f"{topics_not_started}/{topics_total}",
           help="Syllabus topics with no card seen yet.")
 if topics_today:
     st.caption("✅ Topics done today: " + ", ".join(topics_today))
-PR = progress.compute(cards, states, reviews)
+PR = progress.compute(cards, states, reviews, answers)
+marks_txt = ""
+if PR["marks_possible"]:
+    marks_txt = (f"  ·  📝 exam marks **{PR['marks_earned']}/{PR['marks_possible']}** "
+                 f"({PR['ai_accuracy']}%)")
 st.markdown(f"**🔥 Recall points** — today **{PR['points_today']}** · 7 days **{PR['points_7d']}** · "
-            f"total **{PR['total_points']}** · streak **{PR['streak']}d**  ·  "
+            f"total **{PR['total_points']}** · streak **{PR['streak']}d**{marks_txt}  ·  "
             f"topics 🟢{PR['tally']['Strong']} 🟡{PR['tally']['Developing']} "
             f"🟠{PR['tally']['Weak']} ⚪{PR['tally']['Not started']}")
+_goal = PR["goal"]
+st.progress(min(1.0, PR["points_today"] / _goal) if _goal else 0.0,
+            text=f"🎯 Daily goal: {PR['points_today']} / {_goal} recall points"
+                 + ("  ✅ reached!" if PR["points_today"] >= _goal else ""))
 if P["due_today"] + P["new_remaining_target"] > 0:
     st.markdown(f"**Plan:** clear **{P['due_today']} due** + add **{P['new_remaining_target']} new**  "
                 f"·  {P['seen']}/{P['total']} cards covered, {P['unseen']} unseen.")

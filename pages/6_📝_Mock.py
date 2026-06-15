@@ -8,7 +8,7 @@ AI-marked answers are stored, so the mock also feeds Weak Areas and time reports
 import time
 import streamlit as st
 
-from cs1 import db, auth, ai, scheduler
+from cs1 import db, auth, ai, scheduler, coach
 
 st.set_page_config(page_title="Mock Exam - CS1", page_icon="📝", layout="wide")
 uid = auth.require_login()
@@ -160,6 +160,10 @@ if not mock["submitted"]:
                 results.append({"cid": cid, "answer": ans, "grade": gr, "score": sc, "max": mx})
                 prog.progress((i + 1) / len(mock["ids"]), text=f"Marked {i + 1}/{len(mock['ids'])}")
             db.end_session(session_id, int((time.time() - mock["start"]) * 1000), len(mock["ids"]))
+            try:
+                coach.maybe_autorun(uid)  # refresh weak areas from the mock's answers
+            except Exception:
+                pass
             mock["results"] = {"mode": "ai", "items": results, "total": total, "total_max": total_max}
         else:
             mock["results"] = {"mode": "self"}

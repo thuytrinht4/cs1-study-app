@@ -20,22 +20,33 @@ st.title("📈 Progress & Heatmaps")
 cards = db.get_cards(uid)
 states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
+answers = db.get_answers(uid)
 
 if not cards:
     st.info("Import your deck on the Home page first.")
     st.stop()
 
-P = progress.compute(cards, states, reviews)
+P = progress.compute(cards, states, reviews, answers)
 
 # ================================================================ recall points
 st.subheader("Recall points")
-st.caption("Every grade scores: **Again 0 · Hard 1 · Good 2 · Easy 3**. "
-           "More practice and more Good/Easy → more points. That's your progress signal.")
+st.caption("Every grade scores: **Again 0 · Hard 1 · Good 2 · Easy 3** — in both Fast and Deep "
+           "mode. Deep mode and mocks *also* earn real **exam marks** (Claude's score), shown "
+           "below and folded into topic strength.")
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("Points today", P["points_today"])
 k2.metric("Points (last 7 days)", P["points_7d"])
 k3.metric("Total points", P["total_points"])
 k4.metric("Day streak", f"{P['streak']} 🔥")
+_goal = P["goal"]
+st.progress(min(1.0, P["points_today"] / _goal) if _goal else 0.0,
+            text=f"🎯 Daily goal: {P['points_today']} / {_goal} recall points"
+                 + ("  ✅ reached!" if P["points_today"] >= _goal else ""))
+if P["marks_possible"]:
+    mk1, mk2 = st.columns(2)
+    mk1.metric("Exam marks earned (AI/mock)", f"{P['marks_earned']} / {P['marks_possible']}")
+    mk2.metric("AI mark accuracy", f"{P['ai_accuracy']}%",
+               help="Average % of marks Claude awarded on your Deep-mode answers and mocks.")
 rc = P["rating_counts"]
 st.caption(f"Grades so far — Easy {rc[4]} · Good {rc[3]} · Hard {rc[2]} · Again {rc[1]}.  "
            f"Topic status: 🟢 {P['tally']['Strong']} strong · 🟡 {P['tally']['Developing']} developing · "
@@ -80,7 +91,9 @@ with st.expander("Per-topic detail (coverage · practice · Good% · strength)",
     tdf = pd.DataFrame([{
         "Module": r["module"], "Topic": r["topic"],
         "Coverage %": r["coverage"], "Practice (reps)": r["reps"],
-        "Good %": r["good_rate"], "Strength": r["strength"], "Status": r["label"],
+        "Good %": r["good_rate"],
+        "AI mark %": (r["ai_pct"] if r["ai_pct"] is not None else "—"),
+        "Strength": r["strength"], "Status": r["label"],
     } for r in rows])
     styled = tdf.style.applymap(heat_css, subset=["Coverage %", "Good %", "Strength"])
     st.dataframe(styled, use_container_width=True, hide_index=True, height=460)

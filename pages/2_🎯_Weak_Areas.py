@@ -5,7 +5,7 @@ weaknesses per topic, then auto-generates targeted follow-up cards that enter
 your queue. Study them via the 'Targeted follow-ups (AI)' deck on the Study page.
 """
 import streamlit as st
-from cs1 import db, auth, ai
+from cs1 import db, auth, ai, coach
 
 st.set_page_config(page_title="Weak Areas - CS1", page_icon="🎯", layout="centered")
 uid = auth.require_login()
@@ -29,27 +29,21 @@ else:
         st.caption("Uses your recent answers. Best after you've done some Deep-mode marking.")
 
     if run:
-        answers = db.get_recent_answers(uid, limit=50)
-        if len(answers) < 3:
-            st.info(f"Only {len(answers)} marked answers so far. Do a few cards in "
+        with st.spinner("Claude is analysing your answers…"):
+            try:
+                out = coach.run_analysis(uid)
+            except Exception as e:
+                out = None
+                st.error(f"Analysis failed: {e}")
+        if out and not out["ok"]:
+            st.info(f"Only {out['count']} marked answers so far. Do a few cards in "
                     "Deep (AI marking) mode first, then run this for useful patterns.")
-        else:
-            cards = db.get_cards(uid)
-            topic_names = sorted({c["topic"] for c in cards})
-            topic_module = {c["topic"]: c.get("module") for c in cards}
-            open_patterns = db.get_weak_patterns(uid, only_open=True)
-            with st.spinner("Claude is analysing your answers…"):
-                try:
-                    result = ai.find_weak_patterns(answers, open_patterns, topic_names)
-                    for p in result.get("patterns", []):
-                        db.upsert_weak_pattern(uid, p)
-                    n = db.insert_followup_cards(uid, result.get("followup_cards", []), topic_module)
-                    st.session_state["coaching_note"] = result.get("coaching_note", "")
-                    st.session_state["last_followups"] = n
-                    st.success(f"Analysis done. {len(result.get('patterns', []))} patterns updated, "
-                               f"{n} targeted cards generated.")
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
+        elif out and out["ok"]:
+            result = out["result"]
+            st.session_state["coaching_note"] = result.get("coaching_note", "")
+            st.session_state["last_followups"] = out["followups"]
+            st.success(f"Analysis done. {len(result.get('patterns', []))} patterns updated, "
+                       f"{out['followups']} targeted cards generated.")
 
 # ---------------------------------------------------------------- coaching note
 if st.session_state.get("coaching_note"):

@@ -20,6 +20,7 @@ from . import plan  # reuse _as_date / today_utc
 RATING_POINTS = {1: 0, 2: 1, 3: 2, 4: 3}
 RATING_NAME = {1: "Again", 2: "Hard", 3: "Good", 4: "Easy"}
 TARGET_REPS_PER_CARD = 2  # what counts as "enough practice" per card
+DAILY_POINTS_GOAL = 30    # default daily recall-points target (for the goal bar)
 
 
 def points_for(rating) -> int:
@@ -47,7 +48,7 @@ def strength_label(strength: int, reps: int, seen: int) -> str:
 
 
 def compute(cards: list[dict], states: dict, reviews: list[dict],
-            today: date | None = None) -> dict:
+            answers: list[dict] | None = None, today: date | None = None) -> dict:
     today = today or plan.today_utc()
     active = [c for c in cards if c.get("is_active", True)]
     total = len(active)
@@ -59,7 +60,8 @@ def compute(cards: list[dict], states: dict, reviews: list[dict],
     for c in active:
         t = c.get("topic") or "—"
         b = topics.setdefault(t, {"topic": t, "module": c.get("module") or 99,
-                                  "total": 0, "seen": 0, "reps": 0, "good": 0, "points": 0})
+                                  "total": 0, "seen": 0, "reps": 0, "good": 0, "points": 0,
+                                  "ai_earned": 0.0, "ai_possible": 0.0})
         b["total"] += 1
         if c["id"] in seen_ids:
             b["seen"] += 1
@@ -90,6 +92,27 @@ def compute(cards: list[dict], states: dict, reviews: list[dict],
             if rating >= 3:
                 topics[t]["good"] += 1
 
+    # ---- AI marks (Deep mode + mocks): the exam-currency progress signal
+    marks_earned = marks_possible = marks_today = 0.0
+    for a in (answers or []):
+        sc, mx = a.get("ai_score"), a.get("ai_max")
+        if sc is None or mx is None:
+            continue
+        try:
+            sc, mx = float(sc), float(mx)
+        except (TypeError, ValueError):
+            continue
+        if mx <= 0:
+            continue
+        marks_earned += sc
+        marks_possible += mx
+        if plan._as_date(a.get("graded_at")) == today:
+            marks_today += sc
+        t = a.get("topic")
+        if t in topics:
+            topics[t]["ai_earned"] += sc
+            topics[t]["ai_possible"] += mx
+
     # ---- per-topic strength score
     rows = []
     for info in topics.values():
@@ -97,13 +120,18 @@ def compute(cards: list[dict], states: dict, reviews: list[dict],
         good_rate = info["good"] / reps if reps else 0.0
         coverage = seen / tot if tot else 0.0
         depth = min(1.0, reps / (TARGET_REPS_PER_CARD * tot)) if tot else 0.0
+        # recall quality: self-rated Good/Easy rate, blended 50/50 with the AI mark
+        # ratio when Deep-mode/mock marks exist (the exam-currency signal).
+        ai_ratio = info["ai_earned"] / info["ai_possible"] if info["ai_possible"] > 0 else None
+        recall_quality = good_rate if ai_ratio is None else 0.5 * good_rate + 0.5 * ai_ratio
         # quality-dominated: you must have seen the cards (coverage) AND recall them
-        # well (good_rate); more practice (depth) lifts it toward the cap. So a topic
-        # graded mostly 'Again' reads as Weak even at full coverage.
-        quality = 0.25 + 0.75 * good_rate
+        # well; more practice (depth) lifts it toward the cap. So a topic graded mostly
+        # 'Again' (or scoring low with the AI) reads as Weak even at full coverage.
+        quality = 0.25 + 0.75 * recall_quality
         strength = round(100 * coverage * quality * (0.7 + 0.3 * depth))
         rows.append({**info, "good_rate": round(100 * good_rate),
                      "coverage": round(100 * coverage), "depth": round(100 * depth),
+                     "ai_pct": (round(100 * ai_ratio) if ai_ratio is not None else None),
                      "strength": strength, "label": strength_label(strength, reps, seen)})
     rows.sort(key=lambda r: (r["module"], r["topic"]))
 
@@ -115,6 +143,10 @@ def compute(cards: list[dict], states: dict, reviews: list[dict],
     return {
         "today": today,
         "total_points": total_points, "points_today": points_today, "points_7d": points_7d,
+        "goal": DAILY_POINTS_GOAL,
+        "marks_earned": round(marks_earned), "marks_possible": round(marks_possible),
+        "marks_today": round(marks_today),
+        "ai_accuracy": (round(100 * marks_earned / marks_possible) if marks_possible > 0 else None),
         "rating_counts": rating_counts, "streak": _streak(set(per_day), today),
         "topic_rows": rows, "tally": tally, "needs": needs, "per_day": per_day,
         "total": total, "seen": len(seen_ids & {c["id"] for c in active}),

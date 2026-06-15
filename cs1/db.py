@@ -169,6 +169,19 @@ def get_recent_answers(user_id: str, limit: int = 50) -> list[dict]:
     return rows
 
 
+def get_answers(user_id: str) -> list[dict]:
+    """All AI-marked answers, enriched with the card's topic/module (for progress)."""
+    rows = (
+        client().table("answers").select("*, cards(topic, module)")
+        .eq("user_id", user_id).order("graded_at").execute().data
+    )
+    for r in rows:
+        c = r.get("cards") or {}
+        r["topic"] = c.get("topic")
+        r["module"] = c.get("module")
+    return rows
+
+
 def get_reviews(user_id: str) -> list[dict]:
     """All review events, each enriched with the card's topic/module (for reports)."""
     rows = (
