@@ -46,7 +46,8 @@ cards = db.get_cards(uid)
 states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
 answers = db.get_answers(uid)
-P = plan.compute(profile, cards, states, reviews)
+scoped = config.scope_cards(cards)          # plan/progress over exam questions (default)
+P = plan.compute(profile, scoped, states, reviews)
 
 cards_by_id = {c["id"]: c for c in cards}
 today = plan.today_utc()
@@ -92,7 +93,7 @@ m4.metric("Topics not started", f"{topics_not_started}/{topics_total}",
           help="Syllabus topics with no card seen yet.")
 if topics_today:
     st.caption("✅ Topics done today: " + ", ".join(topics_today))
-PR = progress.compute(cards, states, reviews, answers)
+PR = progress.compute(scoped, states, reviews, answers)
 marks_txt = ""
 if PR["marks_possible"]:
     marks_txt = (f"  ·  📝 exam marks **{PR['marks_earned']}/{PR['marks_possible']}** "

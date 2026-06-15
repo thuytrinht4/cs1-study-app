@@ -9,7 +9,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from cs1 import db, auth, plan
+from cs1 import db, auth, plan, config
 
 st.set_page_config(page_title="Plan - CS1", page_icon="📅", layout="wide")
 uid = auth.require_login()
@@ -18,12 +18,13 @@ auth.logout_button()
 st.title("📅 Study Plan")
 
 profile = db.ensure_profile(uid)
-cards = db.get_cards(uid)
+cards = config.scope_cards(db.get_cards(uid))   # exam questions by default
 states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
 
 if not cards:
-    st.info("Import your starter deck on the Home page first, then come back here.")
+    st.info("No exam questions yet. On the Home page, import them "
+            "(*Add / update past-paper-style questions*), then come back here.")
     st.stop()
 
 P = plan.compute(profile, cards, states, reviews)

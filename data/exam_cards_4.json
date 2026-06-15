@@ -1,0 +1,169 @@
+[
+  {
+    "id": "gen_g01",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "μ = exp(η); with a log link exp(β) is a multiplicative rate ratio.",
+    "front": "A Poisson GLM with log link gives η = −0.5 + 0.3·x₁ + 0.8·x₂, where x₁ is numeric and x₂ is a 0/1 indicator.\n\n(i) Estimate the expected count when x₁ = 2 and x₂ = 1. **[2]**\n(ii) Interpret the coefficient 0.3. **[1]**\n(iii) Interpret the coefficient 0.8. **[1]**\n(iv) State two features of the Poisson distribution that make it suitable for counts. **[2]**",
+    "model_answer": "**Approach:** μ = exp(η); with a log link exp(β) is a multiplicative rate ratio.\n\n**Solution:**\n(i) η = −0.5 + 0.3·2 + 0.8·1 = −0.5 + 0.6 + 0.8 = 0.9; μ = e^0.9 = 2.46.\n(ii) exp(0.3) = 1.35: each one-unit increase in x₁ multiplies the expected count by 1.35 (a 35% increase), holding x₂ fixed.\n(iii) exp(0.8) = 2.23: the group with x₂ = 1 has 2.23 times the expected count of the baseline (x₂ = 0).\n(iv) It models non-negative integer counts, and it has mean = variance (a single parameter λ).",
+    "mark_scheme": [
+      {"point": "η = 0.9 and μ = e^0.9 = 2.46", "marks": 2},
+      {"point": "exp(0.3) = 1.35 interpreted (per unit x₁)", "marks": 1},
+      {"point": "exp(0.8) = 2.23 interpreted (vs baseline)", "marks": 1},
+      {"point": "Two valid Poisson features (counts; mean = variance)", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g02",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "π = e^η/(1+e^η); exp(β) is an odds ratio; for a c-unit change use exp(cβ).",
+    "front": "A logistic regression gives logit(π) = −3.0 + 0.05·age + 1.2·smoker.\n\n(i) Calculate the claim probability for a 40-year-old smoker. **[3]**\n(ii) Interpret the smoker coefficient as an odds ratio. **[2]**\n(iii) Calculate the odds ratio for a 10-year increase in age. **[2]**",
+    "model_answer": "**Approach:** π = e^η/(1+e^η); exp(β) is an odds ratio; for a c-unit change use exp(cβ).\n\n**Solution:**\n(i) η = −3.0 + 0.05·40 + 1.2·1 = −3.0 + 2.0 + 1.2 = 0.2; π = e^0.2/(1+e^0.2) = 1.221/2.221 = 0.550.\n(ii) exp(1.2) = 3.32: smokers have 3.32 times the odds of a claim compared with non-smokers of the same age.\n(iii) exp(0.05·10) = exp(0.5) = 1.65: each extra 10 years of age multiplies the odds of a claim by 1.65.",
+    "mark_scheme": [
+      {"point": "η = 0.2", "marks": 1},
+      {"point": "π = 0.550", "marks": 2},
+      {"point": "exp(1.2) = 3.32 as odds ratio", "marks": 2},
+      {"point": "exp(0.5) = 1.65 for 10-year change", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g03",
+    "topic": "4.2 GLMs",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "AIC = −2 ln L + 2k, lower is better; valid for non-nested models too.",
+    "front": "Two GLMs for claim severity are compared: Model A has AIC 520.3, Model B has AIC 512.8.\n\n(i) State what AIC measures and its formula. **[2]**\n(ii) State which model is preferred. **[1]**\n(iii) Explain why AIC (rather than a deviance difference) is used when models are not nested. **[2]**\n(iv) Give one reason a Gamma distribution suits claim severity. **[1]**",
+    "model_answer": "**Approach:** AIC = −2·log-likelihood + 2k (k = number of parameters); lower is better; it applies to any models, nested or not.\n\n**Solution:**\n(i) AIC = −2 ln L + 2k: it trades off goodness of fit (the maximised log-likelihood) against complexity (the number of parameters k).\n(ii) Model B is preferred (lower AIC, 512.8 < 520.3).\n(iii) A deviance/χ² difference test is only valid for nested models (one a restriction of the other); AIC can compare non-nested models, penalising extra parameters directly.\n(iv) Claim severities are continuous, strictly positive and right-skewed, which the Gamma distribution captures.",
+    "mark_scheme": [
+      {"point": "AIC = −2 ln L + 2k with meaning", "marks": 2},
+      {"point": "Model B (lower AIC)", "marks": 1},
+      {"point": "Deviance test needs nested models; AIC does not", "marks": 2},
+      {"point": "Gamma = positive, right-skewed severities", "marks": 1}
+    ]
+  },
+  {
+    "id": "gen_g04",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "PI = ŷ ± t_{0.025,n−2}·se(prediction); wider than the CI for the mean.",
+    "front": "A fitted regression predicts ŷ = 25.0 at x = x₀, with standard error of prediction (for a new observation) 2.0, on 18 degrees of freedom.\n\n(i) State how the prediction interval differs from the confidence interval for the mean. **[1]**\n(ii) Calculate the 95% prediction interval for a new observation at x₀. **[3]**\n(iii) Explain why the prediction interval is the wider of the two. **[1]**",
+    "model_answer": "**Approach:** PI = ŷ ± t_{0.025,n−2}·se(prediction); the prediction se includes the variance of a single new point.\n\n**Solution:**\n(i) The confidence interval estimates the mean response at x₀; the prediction interval covers an individual new observation, so it also includes that observation's own random variation.\n(ii) t_{0.025,18} = 2.101. PI = 25.0 ± 2.101·2.0 = 25.0 ± 4.20 = (20.8, 29.2).\n(iii) It is wider because it combines the uncertainty in the estimated mean with the irreducible variability of an individual observation about that mean.",
+    "mark_scheme": [
+      {"point": "PI covers an individual; CI covers the mean", "marks": 1},
+      {"point": "t_{0.025,18} = 2.101", "marks": 1},
+      {"point": "PI = (20.8, 29.2)", "marks": 2},
+      {"point": "Wider: adds individual-observation variability", "marks": 1}
+    ]
+  },
+  {
+    "id": "gen_g05",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "SST = SSR + SSE; R² = SSR/SST; σ̂² = SSE/(n−2); F = MSR/MSE.",
+    "front": "A simple linear regression on n = 22 observations has regression sum of squares SSR = 240 and error sum of squares SSE = 60.\n\n(i) Calculate R². **[1]**\n(ii) Calculate the residual standard error. **[2]**\n(iii) Test the regression for significance at the 5% level. **[2]**",
+    "model_answer": "**Approach:** SST = SSR + SSE; R² = SSR/SST; σ̂² = SSE/(n−2); F = MSR/MSE on (1, n−2) df.\n\n**Solution:**\n(i) SST = 240 + 60 = 300; R² = 240/300 = 0.80.\n(ii) σ̂² = SSE/(n−2) = 60/20 = 3; residual standard error = √3 = 1.73.\n(iii) F = MSR/MSE = (240/1)/(60/20) = 240/3 = 80 on (1, 20) df. F_{0.05,1,20} = 4.35; since 80 > 4.35, the regression is highly significant.",
+    "mark_scheme": [
+      {"point": "R² = 0.80", "marks": 1},
+      {"point": "σ̂² = 3 and residual SE = 1.73", "marks": 2},
+      {"point": "F = 80 on (1,20) > 4.35 ⇒ significant", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g06",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "F = larger/smaller variance; if unequal, use the Welch t-test (no pooling, adjusted df).",
+    "front": "Two samples have variances s₁² = 200 (n₁ = 10) and s₂² = 20 (n₂ = 10).\n\n(i) Test whether the population variances are equal at the 5% level. **[3]**\n(ii) Hence state which two-sample t-test you should use. **[1]**\n(iii) State one way that test differs from the pooled t-test. **[1]**",
+    "model_answer": "**Approach:** F = larger/smaller sample variance ~ F(df₁, df₂); if variances differ, use the Welch (unequal-variance) t-test.\n\n**Solution:**\n(i) H₀: σ₁² = σ₂². F = 200/20 = 10 on (9, 9) df. Two-sided 5% critical value F_{0.025,9,9} = 4.03. Since 10 > 4.03, reject H₀: the variances differ.\n(ii) Use the Welch (unequal-variance) two-sample t-test.\n(iii) Welch does not pool the variances (it keeps them separate) and uses a reduced, adjusted degrees of freedom instead of n₁ + n₂ − 2.",
+    "mark_scheme": [
+      {"point": "F = 200/20 = 10 on (9, 9) df", "marks": 1},
+      {"point": "Critical 4.03 and reject H₀", "marks": 2},
+      {"point": "Use the Welch t-test", "marks": 1},
+      {"point": "Welch keeps variances separate / adjusts df", "marks": 1}
+    ]
+  },
+  {
+    "id": "gen_g07",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "Fit λ from the sample mean; expected = n·P(X=k); df reduced by 1 for the estimated λ.",
+    "front": "The number of claims per policy is recorded for 100 policies: 0 claims ×50, 1 ×30, 2 ×15, 3+ ×5. Test whether a Poisson distribution fits, at the 5% level.\n\n(i) Estimate the Poisson mean λ. **[1]**\n(ii) Calculate the expected frequencies. **[2]**\n(iii) Calculate the chi-square statistic. **[2]**\n(iv) State the degrees of freedom (noting the estimated parameter) and conclude. **[2]**",
+    "model_answer": "**Approach:** Estimate λ from the sample mean, get expected = n·P(X=k) under the Poisson, χ² = Σ(O−E)²/E, and reduce the df by 1 for the estimated λ.\n\n**Solution:**\n(i) λ̂ = (0·50 + 1·30 + 2·15 + 3·5)/100 = 75/100 = 0.75.\n(ii) With λ = 0.75: P(0) = e^(−0.75) = 0.472, P(1) = 0.354, P(2) = 0.133, P(≥3) = 0.040. Expected (×100): 47.2, 35.4, 13.3, 4.0.\n(iii) χ² = (50−47.2)²/47.2 + (30−35.4)²/35.4 + (15−13.3)²/13.3 + (5−4.0)²/4.0 = 0.16 + 0.83 + 0.22 + 0.23 = 1.44.\n(iv) df = (4 − 1) − 1 (for the estimated λ) = 2. χ²_{0.05,2} = 5.991. Since 1.44 < 5.991, do not reject: the Poisson fits well. (The last expected count ≈ 4 < 5, so ideally combine the final cells.)",
+    "mark_scheme": [
+      {"point": "λ̂ = 0.75", "marks": 1},
+      {"point": "Expected frequencies 47.2, 35.4, 13.3, 4.0", "marks": 2},
+      {"point": "χ² = 1.44", "marks": 2},
+      {"point": "df = 2 (−1 for estimated λ); do not reject", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g08",
+    "topic": "3.1 Estimation & MLE",
+    "module": 3,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Poisson MLE λ̂ = x̄; Fisher information I(λ) = n/λ so Var(λ̂) ≈ λ/n.",
+    "front": "Claim counts X₁,…,Xₙ are independent Poisson(λ).\n\n(i) Write down the log-likelihood. **[1]**\n(ii) Derive the maximum likelihood estimator of λ. **[2]**\n(iii) State the approximate large-sample variance of λ̂. **[2]**",
+    "model_answer": "**Approach:** MLE recipe, then Fisher information for the variance.\n\n**Solution:**\n(i) P(x;λ) = e^(−λ)λ^x/x!. ℓ(λ) = −nλ + (Σxᵢ) ln λ − Σ ln(xᵢ!).\n(ii) dℓ/dλ = −n + Σxᵢ/λ = 0 ⇒ λ̂ = Σxᵢ/n = x̄. The second derivative −Σxᵢ/λ² < 0 confirms a maximum.\n(iii) Fisher information I(λ) = n/λ, so Var(λ̂) ≈ λ/n (estimated by x̄/n).",
+    "mark_scheme": [
+      {"point": "Log-likelihood −nλ + Σx ln λ (− Σ ln x!)", "marks": 1},
+      {"point": "Differentiate and solve λ̂ = x̄", "marks": 2},
+      {"point": "Var(λ̂) ≈ λ/n via Fisher information", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g09",
+    "topic": "5.1 Bayesian statistics",
+    "module": 5,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Gamma prior + Poisson data → Gamma posterior; mean α/β; Z = n/(β+n).",
+    "front": "The claim rate λ has a Gamma(α = 4, β = 2) prior (β the rate parameter). In one period 6 claims are observed.\n\n(i) Identify the posterior distribution, justifying conjugacy. **[2]**\n(ii) Give the posterior mean. **[1]**\n(iii) Express the posterior mean as a credibility estimate and find Z. **[2]**",
+    "model_answer": "**Approach:** Gamma prior + Poisson likelihood → Gamma posterior; mean = α/β; credibility weight Z = n/(β + n).\n\n**Solution:**\n(i) Posterior ∝ λ^(α+Σx−1) e^(−(β+n)λ), a Gamma kernel, so the posterior is Gamma(α+Σx, β+n) = Gamma(4+6, 2+1) = Gamma(10, 3) (conjugate).\n(ii) Posterior mean = 10/3 = 3.33.\n(iii) Posterior mean = (α+Σx)/(β+n) = Z·(Σx/n) + (1−Z)·(α/β), with Z = n/(β+n) = 1/3 = 0.333. Check: 0.333·6 + 0.667·2 = 3.33 ✓.",
+    "mark_scheme": [
+      {"point": "Posterior Gamma(10, 3) with conjugacy shown", "marks": 2},
+      {"point": "Posterior mean = 3.33", "marks": 1},
+      {"point": "Credibility form with Z = 1/3", "marks": 2}
+    ]
+  },
+  {
+    "id": "gen_g10",
+    "topic": "CS1B R — simulation",
+    "module": 2,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "set.seed for reproducibility; replicate; sample(1:6, 10, replace = TRUE); a logical mean estimates the probability.",
+    "front": "(CS1B / R) Estimate, by simulation, the probability that the total of ten fair six-sided dice exceeds 40.\n\n(i) Write reproducible R code to simulate 10000 such totals. **[4]**\n(ii) Write code to estimate P(total > 40) and state what it approximates. **[2]**",
+    "model_answer": "**Approach:** `set.seed` for reproducibility; `replicate` to repeat the experiment; `sample(1:6, 10, replace = TRUE)` rolls ten dice; the mean of a logical vector estimates the probability.\n\n**Solution:**\n(i)\n```r\nset.seed(1)\ntotals <- replicate(10000, sum(sample(1:6, 10, replace = TRUE)))\n```\n(ii)\n```r\nmean(totals > 40)\n```\nThis is the proportion of simulated totals exceeding 40, which approximates the true probability P(total > 40); the estimate improves as the number of simulations increases.",
+    "mark_scheme": [
+      {"point": "set.seed for reproducibility", "marks": 1},
+      {"point": "replicate + sum(sample(1:6, 10, replace = TRUE))", "marks": 3},
+      {"point": "mean(totals > 40)", "marks": 1},
+      {"point": "States it approximates P(total > 40)", "marks": 1}
+    ]
+  }
+]

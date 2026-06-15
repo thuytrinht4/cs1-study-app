@@ -9,7 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from cs1 import db, auth, progress
+from cs1 import db, auth, progress, config
 
 st.set_page_config(page_title="Progress - CS1", page_icon="📈", layout="wide")
 uid = auth.require_login()
@@ -17,13 +17,13 @@ auth.logout_button()
 
 st.title("📈 Progress & Heatmaps")
 
-cards = db.get_cards(uid)
+cards = config.scope_cards(db.get_cards(uid))   # exam questions by default
 states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
 answers = db.get_answers(uid)
 
 if not cards:
-    st.info("Import your deck on the Home page first.")
+    st.info("No exam questions yet. Import them on the Home page first.")
     st.stop()
 
 P = progress.compute(cards, states, reviews, answers)

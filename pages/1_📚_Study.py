@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 import streamlit as st
 
-from cs1 import db, scheduler, auth, ai, plan, coach, progress
+from cs1 import db, scheduler, auth, ai, plan, coach, progress, config
 
 st.set_page_config(page_title="Study - CS1", page_icon="📚", layout="centered")
 uid = auth.require_login()
@@ -57,8 +57,9 @@ def build_queue(deck_name):
     reviews = db.get_reviews(uid)
     answers = db.get_answers(uid)
     profile = db.ensure_profile(uid)
-    P = plan.compute(profile, cards, states, reviews)
-    PR0 = progress.compute(cards, states, reviews, answers)  # today's points baseline
+    scoped = config.scope_cards(cards)                       # exam questions by default
+    P = plan.compute(profile, scoped, states, reviews)
+    PR0 = progress.compute(scoped, states, reviews, answers)  # today's points baseline
     cards_by_id = {c["id"]: c for c in cards}
 
     now = datetime.now(timezone.utc)

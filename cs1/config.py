@@ -49,3 +49,16 @@ def anthropic_ready() -> bool:
 
 def autologin_ready() -> bool:
     return bool(APP_EMAIL and APP_PASSWORD)
+
+
+# Which cards the plan / progress / "today's focus" are about. "exam" = exam-style
+# questions only (the default — you study exam questions); "all" = the whole bank.
+# Override in secrets with STUDY_SCOPE = "all" if you ever want the seed deck counted.
+STUDY_SCOPE = _get("STUDY_SCOPE", "exam")
+
+
+def scope_cards(cards: list) -> list:
+    """Restrict the planning/progress universe to the chosen study scope."""
+    if STUDY_SCOPE == "exam":
+        return [c for c in cards if c.get("source") == "exam"]
+    return list(cards)

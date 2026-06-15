@@ -12,7 +12,7 @@ _DATA = Path(__file__).resolve().parent.parent / "data"
 SEED_PATH = _DATA / "seed_cards.json"
 # Exam-style questions can be split across several files; all are merged.
 EXAM_PATHS = [_DATA / "exam_cards.json", _DATA / "exam_cards_2.json",
-              _DATA / "exam_cards_3.json"]
+              _DATA / "exam_cards_3.json", _DATA / "exam_cards_4.json"]
 
 
 def load_seed() -> list[dict]:
