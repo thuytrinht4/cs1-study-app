@@ -9,7 +9,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from cs1 import db, auth, plan, config
+from cs1 import db, auth, plan, config, schedule
 
 st.set_page_config(page_title="Plan - CS1", page_icon="📅", layout="wide")
 uid = auth.require_login()
@@ -29,6 +29,32 @@ if not cards:
 
 P = plan.compute(profile, cards, states, reviews)
 cards_by_id = {c["id"]: c for c in cards}
+
+# ================================================================ dated schedule (the map)
+today = plan.today_utc()
+sched = schedule.for_date(today)
+st.subheader("📆 Today on your schedule")
+st.markdown(f"**Day {sched['day']} · {sched['phase']}** — {sched['focus']}")
+for a in sched["activities"]:
+    st.markdown(f"- {a}")
+
+
+def _sched_table(entries):
+    return pd.DataFrame([{
+        "Date": e["date"].strftime("%a %d %b"), "Day": e["day"],
+        "Phase": e["phase"], "Focus": e["focus"],
+    } for e in entries])
+
+
+with st.expander("📅 Next 7 days", expanded=True):
+    st.dataframe(_sched_table(schedule.upcoming(today, 7)),
+                 use_container_width=True, hide_index=True)
+with st.expander("🗺️ Full schedule to the exams (the map: all 15 topics learned by 9 Aug)"):
+    st.dataframe(_sched_table(schedule.full_schedule()),
+                 use_container_width=True, hide_index=True, height=460)
+st.caption("This fixed schedule is your map. The adaptive plan below handles the day-to-day "
+           "spacing of recall within it.")
+st.divider()
 
 # ================================================================ headline KPIs
 k1, k2, k3, k4 = st.columns(4)

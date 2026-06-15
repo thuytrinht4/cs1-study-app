@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 import streamlit as st
 
-from cs1 import db, scheduler, auth, ai, plan, coach, progress, config
+from cs1 import db, scheduler, auth, ai, plan, coach, progress, config, schedule
 
 st.set_page_config(page_title="Study - CS1", page_icon="📚", layout="centered")
 uid = auth.require_login()
@@ -68,24 +68,27 @@ def build_queue(deck_name):
         s = states.get(c["id"])
         return s is None or datetime.fromisoformat(s["due"]) <= now
 
-    # today's focus = topics/modules of the cards due or about to be introduced
-    focus_ids = list(P["due_ids"]) + P["unseen_ids"][:max(P["new_remaining_target"], 1)]
-    today_modules = {cards_by_id[i].get("module") for i in focus_ids if i in cards_by_id}
-    today_topics = sorted({cards_by_id[i]["topic"] for i in focus_ids if i in cards_by_id})
-
+    sched = schedule.for_date(plan.today_utc())   # the dated schedule drives today's focus
     note = None
     if deck_name == TODAY_EXAM:
-        in_focus = [c for c in cards if c.get("source") == "exam"
-                    and c.get("module") in today_modules]
-        if any(due_or_new(c) for c in in_focus):
-            def deck_fn(c):
-                return c.get("source") == "exam" and c.get("module") in today_modules
+        df = sched["deck_filter"]
+        if df["kind"] == "r":
+            def base(c):
+                return c.get("source") == "exam" and c.get("type") == "r"
+        elif df["kind"] == "module" and df["modules"]:
+            mods = set(df["modules"])
+            def base(c):
+                return c.get("source") == "exam" and c.get("module") in mods
         else:
-            # no exam Qs available for today's focus modules → show all exam Qs
+            def base(c):
+                return c.get("source") == "exam"
+        if any(due_or_new(c) for c in cards if base(c)):
+            deck_fn = base
+        else:  # nothing scheduled-topic available → fall back to all exam questions
             def deck_fn(c):
                 return c.get("source") == "exam"
-            note = ("No exam questions for today's focus module(s) yet — showing all your "
-                    "exam questions instead. (Import more / generate one on the Home page.)")
+            note = (f"No exam questions for today's scheduled focus ({sched['focus']}) "
+                    "— showing all your exam questions instead.")
         new_limit = 999
     else:
         deck_fn = DECKS[deck_name]
@@ -105,11 +108,9 @@ def build_queue(deck_name):
             due.append(c)
     new.sort(key=lambda c: (c.get("module") or 99, str(c.get("id"))))
     queue_cards = due + new[:new_limit]
-    # for the exam decks, show the topics actually being studied in the HUD
-    if deck_name in (TODAY_EXAM, "Exam-style questions") and queue_cards:
-        today_topics = sorted({c["topic"] for c in queue_cards})
-    extras = {"today_topics": today_topics, "pts_today_base": PR0["points_today"],
-              "goal": PR0["goal"], "note": note}
+    extras = {"today_topics": [sched["focus"]], "pts_today_base": PR0["points_today"],
+              "goal": PR0["goal"], "note": note,
+              "sched_label": f"Day {sched['day']} · {sched['phase']}"}
     return queue_cards, states, P, extras
 
 
@@ -118,7 +119,7 @@ deck_name = st.selectbox("Deck", list(DECKS.keys()) + [TODAY_EXAM])
 RESET_KEYS = ["queue", "cards_by_id", "states", "session_id", "session_start",
               "done", "revealed", "shown_at", "grade_result", "answer_text",
               "session_points", "session_good", "pts_today_base", "goal",
-              "focus_topics", "goal_celebrated", "deck_note"]
+              "focus_topics", "goal_celebrated", "deck_note", "sched_label"]
 if st.session_state.get("deck_name") != deck_name:
     for k in RESET_KEYS:
         st.session_state.pop(k, None)
@@ -142,6 +143,7 @@ if "queue" not in st.session_state:
     st.session_state["goal"] = extras["goal"]
     st.session_state["focus_topics"] = extras["today_topics"]
     st.session_state["deck_note"] = extras.get("note")
+    st.session_state["sched_label"] = extras.get("sched_label")
     st.session_state.pop("goal_celebrated", None)
     st.session_state["revealed"] = False
     st.session_state["shown_at"] = time.time()
@@ -203,7 +205,9 @@ def render_status():
         st.caption("ℹ️ " + st.session_state["deck_note"])
     focus = st.session_state.get("focus_topics", [])
     if focus:
-        st.markdown("🎯 **Today's focus:** " + "  ·  ".join(focus[:4]))
+        lbl = st.session_state.get("sched_label", "")
+        prefix = f"🗺️ {lbl} — " if lbl else ""
+        st.markdown(f"🎯 **Today's focus:** {prefix}" + "  ·  ".join(focus[:4]))
     pts_today = st.session_state["pts_today_base"] + st.session_state["session_points"]
     goal = st.session_state.get("goal") or progress.DAILY_POINTS_GOAL
     elapsed = time.time() - st.session_state["session_start"]

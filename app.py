@@ -4,7 +4,7 @@ Run:  streamlit run app.py
 """
 import streamlit as st
 
-from cs1 import config, db, seed, auth, plan, ai, progress
+from cs1 import config, db, seed, auth, plan, ai, progress, schedule
 
 st.set_page_config(page_title="CS1 Study Trainer", page_icon="📘", layout="centered")
 st.title("📘 CS1 Study Trainer")
@@ -83,8 +83,10 @@ focus_ids = list(P["due_ids"]) + P["unseen_ids"][:max(P["new_remaining_target"],
 focus_topics = sorted({cards_by_id[i]["topic"] for i in focus_ids if i in cards_by_id})
 
 st.markdown("### Today")
-if focus_topics:
-    st.markdown("**Today's focus:** " + "  ·  ".join(focus_topics))
+sched = schedule.for_date(today)
+st.markdown(f"**🗺️ Schedule — Day {sched['day']} · {sched['phase']}:**  {sched['focus']}")
+if sched.get("activities"):
+    st.caption("Today: " + "  ·  ".join(sched["activities"][:3]))
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("Due now", P["due_today"])
 m2.metric("Answered today", answered_today, help="Cards you've reviewed so far today.")
