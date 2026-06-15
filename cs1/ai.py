@@ -83,9 +83,16 @@ def grade_answer(card: dict, answer_text: str) -> dict:
     msg = _get_client().messages.create(
         model=config.MODEL_MARKER,
         max_tokens=800,
-        tools=[GRADE_TOOL],
+        # cache_control marks the static prefix (system + tools) as cacheable.
+        # Note: prompt caching only *bills less* when that cached prefix exceeds
+        # Anthropic's minimum (~2048 tokens for Haiku, ~1024 for Sonnet). Our
+        # system+tools here are smaller than that, so today the saving is ~nil —
+        # this is correct, free, future-proofing for if these prompts grow. The
+        # real cost levers are: use Deep only on substantive cards (self-grade
+        # the quick ones) and generate questions free on your Max plan.
+        tools=[{**GRADE_TOOL, "cache_control": {"type": "ephemeral"}}],
         tool_choice={"type": "tool", "name": "report_mark"},
-        system=SYSTEM,
+        system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": _user_prompt(card, answer_text)}],
     )
     for block in msg.content:
@@ -155,9 +162,9 @@ def find_weak_patterns(answers: list[dict], open_patterns: list[dict], topic_nam
     msg = _get_client().messages.create(
         model=config.MODEL_ANALYST,
         max_tokens=1600,
-        tools=[ANALYZE_TOOL],
+        tools=[{**ANALYZE_TOOL, "cache_control": {"type": "ephemeral"}}],
         tool_choice={"type": "tool", "name": "report_patterns"},
-        system=ANALYZE_SYSTEM,
+        system=[{"type": "text", "text": ANALYZE_SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": content}],
     )
     for block in msg.content:
@@ -205,9 +212,9 @@ def generate_exam_question(topic: str) -> dict:
     msg = _get_client().messages.create(
         model=config.MODEL_ANALYST,
         max_tokens=1500,
-        tools=[GENERATE_TOOL],
+        tools=[{**GENERATE_TOOL, "cache_control": {"type": "ephemeral"}}],
         tool_choice={"type": "tool", "name": "report_question"},
-        system=GENERATE_SYSTEM,
+        system=[{"type": "text", "text": GENERATE_SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": f"Write one exam-style CS1 question on: {topic}."}],
     )
     for block in msg.content:
