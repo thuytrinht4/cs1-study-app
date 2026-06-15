@@ -64,35 +64,36 @@ def build_queue(deck_name):
     cards_by_id = {c["id"]: c for c in cards}
 
     now = datetime.now(timezone.utc)
-
-    def due_or_new(c):
-        s = states.get(c["id"])
-        return s is None or datetime.fromisoformat(s["due"]) <= now
-
     sched = schedule.for_date(plan.today_utc())   # the dated schedule drives today's focus
     note = None
+    # due_fn = which cards may resurface as spaced-repetition reviews;
+    # new_fn = which brand-new cards to introduce today.
     if deck_name == TODAY_EXAM:
         df = sched["deck_filter"]
         if df["kind"] == "r":
-            def base(c):
+            def new_fn(c):
                 return c.get("source") == "exam" and c.get("type") == "r"
         elif df["kind"] == "module" and df["modules"]:
             mods = set(df["modules"])
-            def base(c):
+            def new_fn(c):
                 return c.get("source") == "exam" and c.get("module") in mods
         else:
-            def base(c):
+            def new_fn(c):
                 return c.get("source") == "exam"
-        if any(due_or_new(c) for c in cards if base(c)):
-            deck_fn = base
-        else:  # nothing scheduled-topic available → fall back to all exam questions
-            def deck_fn(c):
+        # if no NEW cards for today's focus, draw new ones from all exam questions
+        if not any(states.get(c["id"]) is None and new_fn(c) for c in cards):
+            _orig_new_fn = new_fn
+            def new_fn(c):
                 return c.get("source") == "exam"
-            note = (f"No exam questions for today's scheduled focus ({sched['focus']}) "
-                    "— showing all your exam questions instead.")
+            note = (f"No new exam questions left for today's focus ({sched['focus']}) "
+                    "— drawing new ones from all topics; due reviews still come first.")
+        # due reviews come from ANY exam topic, so spaced repetition is never skipped
+        def due_fn(c):
+            return c.get("source") == "exam"
         new_limit = 999
     else:
         deck_fn = DECKS[deck_name]
+        due_fn = new_fn = deck_fn
         # per-DAY new-card budget; AI-remediation & exam decks are exempt for free drilling
         if deck_name in ("Targeted follow-ups (AI)", "Exam-style questions"):
             new_limit = 999
@@ -101,12 +102,14 @@ def build_queue(deck_name):
 
     due, new = [], []
     for c in cards:
-        if not deck_fn(c):
-            continue
-        if states.get(c["id"]) is None:
-            new.append(c)
-        elif datetime.fromisoformat(states[c["id"]]["due"]) <= now:
+        s = states.get(c["id"])
+        if s is None:
+            if new_fn(c):
+                new.append(c)
+        elif datetime.fromisoformat(s["due"]) <= now and due_fn(c):
             due.append(c)
+    # spaced repetition: clear the most-overdue reviews first, then today's new cards
+    due.sort(key=lambda c: states[c["id"]]["due"])
     new.sort(key=lambda c: (c.get("module") or 99, str(c.get("id"))))
     queue_cards = due + new[:new_limit]
     extras = {"today_topics": [sched["focus"]], "pts_today_base": PR0["points_today"],
