@@ -4,7 +4,7 @@ Run:  streamlit run app.py
 """
 import streamlit as st
 
-from cs1 import config, db, seed, auth, plan, ai
+from cs1 import config, db, seed, auth, plan, ai, progress
 
 st.set_page_config(page_title="CS1 Study Trainer", page_icon="📘", layout="centered")
 st.title("📘 CS1 Study Trainer")
@@ -91,14 +91,20 @@ m4.metric("Topics not started", f"{topics_not_started}/{topics_total}",
           help="Syllabus topics with no card seen yet.")
 if topics_today:
     st.caption("✅ Topics done today: " + ", ".join(topics_today))
+PR = progress.compute(cards, states, reviews)
+st.markdown(f"**🔥 Recall points** — today **{PR['points_today']}** · 7 days **{PR['points_7d']}** · "
+            f"total **{PR['total_points']}** · streak **{PR['streak']}d**  ·  "
+            f"topics 🟢{PR['tally']['Strong']} 🟡{PR['tally']['Developing']} "
+            f"🟠{PR['tally']['Weak']} ⚪{PR['tally']['Not started']}")
 if P["due_today"] + P["new_remaining_target"] > 0:
     st.markdown(f"**Plan:** clear **{P['due_today']} due** + add **{P['new_remaining_target']} new**  "
                 f"·  {P['seen']}/{P['total']} cards covered, {P['unseen']} unseen.")
 else:
     st.success("Nothing required today — you're ahead. Studying more is optional.")
-pc1, pc2 = st.columns(2)
+pc1, pc2, pc3 = st.columns(3)
 pc1.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
 pc2.page_link("pages/4_📅_Plan.py", label="📅 Full plan & task list", icon="📅")
+pc3.page_link("pages/7_📈_Progress.py", label="📈 Progress & heatmaps", icon="📈")
 
 # ---- weak points
 st.divider()
