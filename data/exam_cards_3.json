@@ -1,0 +1,291 @@
+[
+  {
+    "id": "EX-CS1B-5",
+    "topic": "CS1B R — descriptive statistics",
+    "module": 1,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Base summaries: mean/sd/summary/quantile; a logical vector's mean is a proportion; hist/boxplot for shape.",
+    "front": "(CS1B / R) A numeric vector `claims` holds claim amounts.\n\n(i) Write R to report the mean, standard deviation and five-number summary. **[3]**\n(ii) Write R to find the proportion of claims exceeding 1000. **[2]**\n(iii) State how you would visually check for skewness. **[1]**",
+    "model_answer": "**Approach:** Use base summaries; `mean(logical)` gives a proportion; a histogram or boxplot shows shape.\n\n**Solution:**\n(i)\n```r\nmean(claims)\nsd(claims)\nsummary(claims)        # min, Q1, median, mean, Q3, max\n```\n(ii)\n```r\nmean(claims > 1000)    # proportion exceeding 1000\n```\n(iii) Draw `hist(claims)` or `boxplot(claims)`; a long right tail (or median below the mean) indicates positive skew.",
+    "mark_scheme": [
+      {"point": "mean(claims) and sd(claims)", "marks": 1},
+      {"point": "summary() / five-number summary", "marks": 2},
+      {"point": "mean(claims > 1000) for the proportion", "marks": 2},
+      {"point": "hist/boxplot to assess skew", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-CS1B-6",
+    "topic": "CS1B R — distributions (d/p/q/r)",
+    "module": 2,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "dpois = pmf, ppois = cdf, qpois = quantile, rpois = simulate.",
+    "front": "(CS1B / R) Claim counts follow Poisson(λ = 3).\n\n(i) Write R to find P(X = 2) and P(X ≤ 4). **[2]**\n(ii) Write R to find the smallest k with P(X ≤ k) ≥ 0.95. **[2]**\n(iii) Write R to simulate 1000 values and estimate their mean. **[2]**",
+    "model_answer": "**Approach:** The `d/p/q/r` family: `dpois` (pmf), `ppois` (cdf), `qpois` (quantile), `rpois` (simulate). Always `set.seed` before simulating.\n\n**Solution:**\n(i)\n```r\ndpois(2, lambda = 3)        # P(X = 2) = 0.224\nppois(4, lambda = 3)        # P(X <= 4) = 0.815\n```\n(ii)\n```r\nqpois(0.95, lambda = 3)     # 95th percentile\n```\n(iii)\n```r\nset.seed(1)\nmean(rpois(1000, lambda = 3))   # close to 3\n```",
+    "mark_scheme": [
+      {"point": "dpois(2, lambda = 3)", "marks": 1},
+      {"point": "ppois(4, lambda = 3)", "marks": 1},
+      {"point": "qpois(0.95, lambda = 3)", "marks": 2},
+      {"point": "set.seed + rpois(1000,...) + mean", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-7",
+    "topic": "CS1B R — one-sample t-test",
+    "module": 3,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "t.test(x, mu = 100) tests the mean and prints the CI; interpret p in context.",
+    "front": "(CS1B / R) A vector `x` holds 20 observations; test whether the population mean equals 100.\n\n(i) Write R to perform the test. **[2]**\n(ii) Output: `t = 2.4, df = 19, p-value = 0.027`. State the conclusion at 5%. **[2]**\n(iii) Write R to obtain the 95% confidence interval for the mean. **[2]**",
+    "model_answer": "**Approach:** `t.test(x, mu = 100)` runs the test and reports the CI; conclude in context from the p-value.\n\n**Solution:**\n(i)\n```r\nt.test(x, mu = 100)\n```\n(ii) p = 0.027 < 0.05, so reject H₀: there is significant evidence at the 5% level that the mean differs from 100.\n(iii)\n```r\nt.test(x, mu = 100)$conf.int   # 95% CI for the mean\n```",
+    "mark_scheme": [
+      {"point": "t.test(x, mu = 100)", "marks": 2},
+      {"point": "p < 0.05 → reject, in context", "marks": 2},
+      {"point": "$conf.int for the 95% CI", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-8",
+    "topic": "CS1B R — F-test for variances",
+    "module": 3,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "var.test(a, b) is the F-test; if variances equal, t.test(..., var.equal = TRUE).",
+    "front": "(CS1B / R) Two numeric vectors `a` and `b`.\n\n(i) Write R to test whether the two populations have equal variances. **[2]**\n(ii) Write R to then test equality of means assuming equal variances. **[2]**\n(iii) Why run the variance test before choosing the t-test? **[2]**",
+    "model_answer": "**Approach:** `var.test` (F-test) checks equal variances; if not rejected, use the pooled t-test `var.equal = TRUE`, otherwise Welch.\n\n**Solution:**\n(i)\n```r\nvar.test(a, b)\n```\n(ii)\n```r\nt.test(a, b, var.equal = TRUE)\n```\n(iii) The pooled two-sample t-test assumes the two population variances are equal; the F-test checks that assumption. If variances differ, use the Welch test (`var.equal = FALSE`, the default).",
+    "mark_scheme": [
+      {"point": "var.test(a, b)", "marks": 2},
+      {"point": "t.test(a, b, var.equal = TRUE)", "marks": 2},
+      {"point": "Pooled t-test assumes equal variances; else Welch", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-CS1B-9",
+    "topic": "CS1B R — test of a proportion",
+    "module": 3,
+    "type": "r",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "prop.test(x, n, p) tests a proportion and gives a CI.",
+    "front": "(CS1B / R) In 200 trials there are 90 successes; test whether the success probability is 0.5.\n\n(i) Write R to carry out the test. **[2]**\n(ii) Write R to get a 95% confidence interval for the proportion. **[2]**\n(iii) State one condition for the Normal approximation used. **[1]**",
+    "model_answer": "**Approach:** `prop.test(x, n, p)` tests a proportion against p and reports a CI.\n\n**Solution:**\n(i)\n```r\nprop.test(90, 200, p = 0.5)\n```\n(ii)\n```r\nprop.test(90, 200)$conf.int\n```\n(iii) The Normal approximation needs a large sample: both np and n(1−p) reasonably large (commonly ≥ 5).",
+    "mark_scheme": [
+      {"point": "prop.test(90, 200, p = 0.5)", "marks": 2},
+      {"point": "$conf.int for the proportion", "marks": 2},
+      {"point": "np, n(1−p) ≥ 5 (large sample)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-CS1B-10",
+    "topic": "CS1B R — correlation",
+    "module": 4,
+    "type": "r",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "cor.test(x, y) tests ρ = 0 and gives the estimate; plot(x, y) checks linearity.",
+    "front": "(CS1B / R) Vectors `x` and `y`.\n\n(i) Write R to test the correlation and report the estimate. **[2]**\n(ii) Output: `cor = 0.6, p-value = 0.005`. Interpret. **[2]**\n(iii) Write R to produce a scatter plot to check linearity. **[1]**",
+    "model_answer": "**Approach:** `cor.test(x, y)` gives the correlation, a test of ρ = 0 and a CI; check linearity visually first.\n\n**Solution:**\n(i)\n```r\ncor.test(x, y)\n```\n(ii) r = 0.6 with p = 0.005 < 0.05: a moderate positive linear association, significant at the 5% level. (Correlation does not imply causation.)\n(iii)\n```r\nplot(x, y)\n```",
+    "mark_scheme": [
+      {"point": "cor.test(x, y)", "marks": 2},
+      {"point": "Interpret r = 0.6 and significance", "marks": 2},
+      {"point": "plot(x, y) for linearity", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-CS1B-11",
+    "topic": "CS1B R — linear regression",
+    "module": 4,
+    "type": "r",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "lm() fits; summary()/confint() report estimates+CIs; predict(..., interval='confidence').",
+    "front": "(CS1B / R) Data frame `dat` with `y` and `x`.\n\n(i) Write R to fit y on x and show the summary. **[2]**\n(ii) Write R to extract 95% confidence intervals for the coefficients. **[2]**\n(iii) Write R to predict y at x = 8 with a 95% confidence interval for the mean response. **[3]**",
+    "model_answer": "**Approach:** `lm()` fits; `summary()` and `confint()` give estimates and CIs; `predict(..., interval='confidence')` gives the mean-response interval (use 'prediction' for a new individual).\n\n**Solution:**\n(i)\n```r\nfit <- lm(y ~ x, data = dat)\nsummary(fit)\n```\n(ii)\n```r\nconfint(fit)           # 95% CIs for intercept and slope\n```\n(iii)\n```r\npredict(fit, newdata = data.frame(x = 8), interval = \"confidence\", level = 0.95)\n```",
+    "mark_scheme": [
+      {"point": "lm(y ~ x, data = dat) + summary", "marks": 2},
+      {"point": "confint(fit)", "marks": 2},
+      {"point": "predict(..., interval = \"confidence\") at x = 8", "marks": 3}
+    ]
+  },
+  {
+    "id": "EX-CS1B-12",
+    "topic": "CS1B R — logistic regression",
+    "module": 4,
+    "type": "r",
+    "max_marks": 7,
+    "source": "exam",
+    "hint": "glm(..., family = binomial); exp(coef()) = odds ratios; predict(..., type='response') = probabilities.",
+    "front": "(CS1B / R) Data frame `dat` has binary `claim` (0/1) and covariate `age`.\n\n(i) Write R to fit a logistic regression of `claim` on `age`. **[2]**\n(ii) Write R to obtain the odds ratio for age. **[2]**\n(iii) Write R to predict the claim probability at age = 50. **[3]**",
+    "model_answer": "**Approach:** `glm(..., family = binomial)` fits logistic regression; `exp(coef())` converts log-odds to odds ratios; `predict(..., type='response')` returns probabilities.\n\n**Solution:**\n(i)\n```r\nfit <- glm(claim ~ age, family = binomial, data = dat)\nsummary(fit)\n```\n(ii)\n```r\nexp(coef(fit))          # odds ratio for age = exp(beta_age)\n```\n(iii)\n```r\npredict(fit, newdata = data.frame(age = 50), type = \"response\")\n```",
+    "mark_scheme": [
+      {"point": "glm(claim ~ age, family = binomial)", "marks": 2},
+      {"point": "exp(coef(fit)) for the odds ratio", "marks": 2},
+      {"point": "predict(..., type = \"response\") at age = 50", "marks": 3}
+    ]
+  },
+  {
+    "id": "EX-CS1B-13",
+    "topic": "CS1B R — one-way ANOVA",
+    "module": 4,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "aov(cost ~ region) then summary(); check Normal residuals and equal variance.",
+    "front": "(CS1B / R) Data frame `dat` has numeric `cost` and factor `region` (3 levels).\n\n(i) Write R to run a one-way ANOVA of cost by region and show the table. **[3]**\n(ii) The ANOVA p-value is 0.01. State the conclusion. **[2]**\n(iii) Name one assumption to check and how. **[1]**",
+    "model_answer": "**Approach:** `aov(cost ~ region)` then `summary()` gives the ANOVA table; check Normality of residuals and equal variance across groups.\n\n**Solution:**\n(i)\n```r\nfit <- aov(cost ~ region, data = dat)\nsummary(fit)\n```\n(ii) p = 0.01 < 0.05, so reject H₀ of equal means: at least one region's mean cost differs.\n(iii) Equal variance across groups — check with `bartlett.test(cost ~ region, data = dat)`; Normality of residuals via `qqnorm(resid(fit)); qqline(resid(fit))`.",
+    "mark_scheme": [
+      {"point": "aov(cost ~ region, data = dat)", "marks": 2},
+      {"point": "summary(fit) for the table", "marks": 1},
+      {"point": "p < 0.05 → reject, in context", "marks": 2},
+      {"point": "Check equal variance / Normality of residuals", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-CS1B-14",
+    "topic": "CS1B R — Bayesian posterior",
+    "module": 5,
+    "type": "r",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Beta posterior: mean α/(α+β); qbeta for a credible interval; pbeta for tail probabilities.",
+    "front": "(CS1B / R) A Beta(2, 2) prior for p is updated with 8 successes in 20 trials, giving a Beta(10, 14) posterior.\n\n(i) Write R to compute the posterior mean and a 95% credible interval. **[3]**\n(ii) Write R to find the posterior probability that p > 0.5. **[2]**\n(iii) Write R to simulate 10000 draws from the posterior. **[1]**",
+    "model_answer": "**Approach:** Use the Beta `d/p/q/r` functions on the posterior Beta(10, 14): mean = α/(α+β); credible interval from `qbeta`; tail probability from `pbeta`.\n\n**Solution:**\n(i)\n```r\n10 / (10 + 14)                    # posterior mean = 0.417\nqbeta(c(0.025, 0.975), 10, 14)    # 95% credible interval\n```\n(ii)\n```r\n1 - pbeta(0.5, 10, 14)            # P(p > 0.5)\n```\n(iii)\n```r\nset.seed(1)\nrbeta(10000, 10, 14)\n```",
+    "mark_scheme": [
+      {"point": "Posterior mean 10/24 = 0.417", "marks": 1},
+      {"point": "qbeta(c(0.025,0.975), 10, 14) credible interval", "marks": 2},
+      {"point": "1 - pbeta(0.5, 10, 14) for P(p>0.5)", "marks": 2},
+      {"point": "set.seed + rbeta(10000, 10, 14)", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-1.1-1",
+    "topic": "1.1 Descriptive statistics",
+    "module": 1,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Right-skew: mode < median < mean. IQR ignores tails (robust). Skewness = standardised 3rd moment.",
+    "front": "Claim amounts are positively (right) skewed.\n\n(i) State the order of the mean, median and mode for such a distribution. **[1]**\n(ii) Define the interquartile range and explain why it is more robust than the standard deviation. **[2]**\n(iii) Define the coefficient of skewness and state its sign here. **[2]**",
+    "model_answer": "**Approach:** Recall location, spread and shape measures and robustness to outliers.\n\n**Solution:**\n(i) For a right-skewed distribution: mode < median < mean (the long right tail pulls the mean up).\n(ii) IQR = Q₃ − Q₁, the spread of the middle 50% of the data. It is more robust because it ignores the extreme tails, so the large outliers common in claims data do not distort it as they would the standard deviation.\n(iii) The coefficient of skewness is E[(X−μ)³]/σ³ (the standardised third central moment); for a right-skewed distribution it is positive.",
+    "mark_scheme": [
+      {"point": "mode < median < mean", "marks": 1},
+      {"point": "IQR = Q3 − Q1", "marks": 1},
+      {"point": "Robust because it ignores the tails/outliers", "marks": 1},
+      {"point": "Skewness = E[(X−μ)³]/σ³", "marks": 1},
+      {"point": "Positive for right skew", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.5-1",
+    "topic": "2.5 Conditional probability & Bayes",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 6,
+    "source": "exam",
+    "hint": "Bayes' theorem with total probability in the denominator; beware the low base rate.",
+    "front": "A diagnostic test for a condition present in 2% of policyholders has sensitivity 0.95 and specificity 0.90.\n\n(i) State Bayes' theorem. **[1]**\n(ii) Calculate the probability a policyholder has the condition given a positive test. **[4]**\n(iii) Comment on the result. **[1]**",
+    "model_answer": "**Approach:** Apply Bayes' theorem, computing P(positive) with the law of total probability.\n\n**Solution:**\n(i) P(A | B) = P(B | A)·P(A) / P(B).\n(ii) Let D = has condition. P(D) = 0.02, P(+|D) = 0.95 (sensitivity), P(+|Dᶜ) = 1 − 0.90 = 0.10.\nP(+) = 0.95·0.02 + 0.10·0.98 = 0.019 + 0.098 = 0.117.\nP(D | +) = 0.019 / 0.117 = 0.162.\n(iii) Even with an accurate test, only about 16% of positives truly have the condition, because it is rare (low base rate) — false positives swamp the true positives.",
+    "mark_scheme": [
+      {"point": "Bayes' theorem stated", "marks": 1},
+      {"point": "P(+|Dᶜ) = 0.10", "marks": 1},
+      {"point": "P(+) = 0.117 by total probability", "marks": 1},
+      {"point": "P(D|+) = 0.162", "marks": 2},
+      {"point": "Comment on low base rate / false positives", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-3.3-8",
+    "topic": "3.3 Hypothesis testing",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Type I = reject true H0 (α); Type II = fail to reject false H0 (β); power = 1 − β.",
+    "front": "(i) Define a Type I error and a Type II error. **[2]**\n(ii) Define the power of a test. **[1]**\n(iii) State two ways to increase the power of a test. **[2]**",
+    "model_answer": "**Approach:** Recall the error definitions and the levers that affect power.\n\n**Solution:**\n(i) Type I error: rejecting H₀ when it is in fact true (probability α). Type II error: failing to reject H₀ when it is in fact false (probability β).\n(ii) Power = 1 − β, the probability of correctly rejecting a false H₀ (detecting a real effect).\n(iii) Increase power by, e.g.: increasing the sample size; increasing the significance level α; reducing variability; or a larger true effect size. (Any two.)",
+    "mark_scheme": [
+      {"point": "Type I error defined (reject true H0)", "marks": 1},
+      {"point": "Type II error defined (fail to reject false H0)", "marks": 1},
+      {"point": "Power = 1 − β", "marks": 1},
+      {"point": "Two valid ways to increase power", "marks": 2}
+    ]
+  },
+  {
+    "id": "EX-3.1-4",
+    "topic": "3.1 Estimation & MLE",
+    "module": 3,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Unbiased: E[θ̂]=θ. Consistent: θ̂→θ in probability. MLE invariance. CRLB = 1/I(θ).",
+    "front": "(i) Define what it means for an estimator to be (a) unbiased and (b) consistent. **[2]**\n(ii) State the invariance property of maximum likelihood estimators. **[1]**\n(iii) State what the Cramér–Rao lower bound gives and define an efficient estimator. **[2]**",
+    "model_answer": "**Approach:** Recall the standard estimator properties.\n\n**Solution:**\n(i) (a) Unbiased: E[θ̂] = θ for all θ (no systematic error). (b) Consistent: θ̂ converges in probability to θ as n → ∞ (P(|θ̂ − θ| > ε) → 0 for any ε > 0).\n(ii) Invariance: if θ̂ is the MLE of θ, then g(θ̂) is the MLE of g(θ) for any function g.\n(iii) The Cramér–Rao lower bound is the smallest possible variance of an unbiased estimator, 1/I(θ). An efficient estimator is an unbiased estimator whose variance attains this bound.",
+    "mark_scheme": [
+      {"point": "Unbiased: E[θ̂] = θ", "marks": 1},
+      {"point": "Consistent: θ̂ → θ in probability", "marks": 1},
+      {"point": "MLE invariance", "marks": 1},
+      {"point": "CRLB = 1/I(θ)", "marks": 1},
+      {"point": "Efficient = unbiased attaining the CRLB", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-4.1-5",
+    "topic": "4.1 Linear regression",
+    "module": 4,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Partial slope holds others fixed; multicollinearity inflates SEs; adjusted R² penalises predictors.",
+    "front": "(i) In multiple regression, interpret a slope coefficient. **[1]**\n(ii) Define multicollinearity and state one problem it causes. **[2]**\n(iii) State how adjusted R² differs from R² and why it is preferred for model selection. **[2]**",
+    "model_answer": "**Approach:** Recall interpretation of partial effects, multicollinearity, and model-selection criteria.\n\n**Solution:**\n(i) A slope is the expected change in the response for a one-unit increase in that predictor, **holding the other predictors constant**.\n(ii) Multicollinearity is strong correlation among the predictors. It inflates the standard errors of the coefficient estimates, making them unstable and hard to interpret (signs can even flip), though predictions may still be acceptable.\n(iii) Adjusted R² penalises the number of predictors, so (unlike R², which never decreases when predictors are added) it can fall when a useless predictor is added — making it the fairer measure for comparing models of different sizes.",
+    "mark_scheme": [
+      {"point": "Slope = effect holding others fixed", "marks": 1},
+      {"point": "Multicollinearity = predictors strongly correlated", "marks": 1},
+      {"point": "Problem: inflated/unstable standard errors", "marks": 1},
+      {"point": "Adjusted R² penalises number of predictors", "marks": 1},
+      {"point": "Preferred for comparing models of different sizes", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-2.1-2",
+    "topic": "2.1 Distributions",
+    "module": 2,
+    "type": "formula",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Counts over time t ~ Poisson(λt); inter-arrival times ~ Exponential(λ).",
+    "front": "Claims arrive as a Poisson process with rate λ = 2 per month.\n\n(i) State the distribution of the number of claims in a 6-month period and its mean. **[2]**\n(ii) State the distribution of the waiting time between consecutive claims. **[1]**\n(iii) Calculate the probability of no claims in a given month. **[2]**",
+    "model_answer": "**Approach:** For a Poisson process, counts over a period of length t are Poisson(λt) and inter-arrival times are Exponential(λ).\n\n**Solution:**\n(i) Number of claims in 6 months ~ Poisson(λt) = Poisson(2 × 6) = Poisson(12), with mean 12.\n(ii) The waiting time between consecutive claims is Exponential(λ = 2) (mean 1/2 month).\n(iii) Monthly count ~ Poisson(2). P(0) = e^(−2) = 0.135.",
+    "mark_scheme": [
+      {"point": "Poisson(12) for 6 months", "marks": 1},
+      {"point": "Mean = 12", "marks": 1},
+      {"point": "Inter-arrival ~ Exponential(2)", "marks": 1},
+      {"point": "P(0) = e^(−2)", "marks": 1},
+      {"point": "= 0.135", "marks": 1}
+    ]
+  },
+  {
+    "id": "EX-5.1-4",
+    "topic": "5.1 Bayesian statistics",
+    "module": 5,
+    "type": "concept",
+    "max_marks": 5,
+    "source": "exam",
+    "hint": "Bayes estimate = mean/median/mode for quadratic/absolute/0-1 loss.",
+    "front": "(i) State the Bayes estimate of a parameter under (a) quadratic loss, (b) absolute-error loss, (c) all-or-nothing (0–1) loss. **[3]**\n(ii) A posterior is Beta(10, 14). Give the Bayes estimate under quadratic loss and under 0–1 loss. **[2]**",
+    "model_answer": "**Approach:** The Bayes estimate is the posterior summary minimising expected loss: mean / median / mode for quadratic / absolute / 0–1 loss.\n\n**Solution:**\n(i) (a) Quadratic loss → posterior **mean**. (b) Absolute-error loss → posterior **median**. (c) 0–1 loss → posterior **mode**.\n(ii) For Beta(10, 14): posterior mean = 10/(10+14) = 0.417 (quadratic loss); posterior mode = (10−1)/(10+14−2) = 9/22 = 0.409 (0–1 loss).",
+    "mark_scheme": [
+      {"point": "Quadratic loss → mean", "marks": 1},
+      {"point": "Absolute loss → median", "marks": 1},
+      {"point": "0–1 loss → mode", "marks": 1},
+      {"point": "Mean = 0.417", "marks": 1},
+      {"point": "Mode = 0.409", "marks": 1}
+    ]
+  }
+]

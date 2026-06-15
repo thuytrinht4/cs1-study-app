@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 import streamlit as st
 
-from cs1 import db, scheduler, auth, ai, plan, coach
+from cs1 import db, scheduler, auth, ai, plan, coach, progress
 
 st.set_page_config(page_title="Study - CS1", page_icon="📚", layout="centered")
 uid = auth.require_login()
@@ -29,6 +29,12 @@ DECKS = {
     "Module 5 - Bayesian": lambda c: c["module"] == 5 and c["type"] != "r",
     "Targeted follow-ups (AI)": lambda c: c.get("source") == "ai_followup",
 }
+TODAY_EXAM = "📝 Exam Qs — today's topics"  # dynamic deck (handled in build_queue)
+
+# Anki-style in-session learning steps: a card you fail comes back THIS session,
+# soon — Again very soon, Hard a bit later. Good/Easy graduate (leave the session;
+# FSRS schedules their next day). This is what makes active recall actually bite.
+REQUEUE_GAP = {1: 3, 2: 8}  # rating -> how many cards later it reappears
 
 # ---------------------------------------------------------------- sidebar: mode
 ai_on = ai.available()
@@ -45,15 +51,34 @@ if deep and not ai_on:
     deep = False
 
 
-def build_queue(deck_fn, deck_name):
+def build_queue(deck_name):
     cards = db.get_cards(uid)
     states = db.get_card_states(uid)
     reviews = db.get_reviews(uid)
+    answers = db.get_answers(uid)
     profile = db.ensure_profile(uid)
     P = plan.compute(profile, cards, states, reviews)
-    # per-DAY new-card budget (today's max minus what you've already introduced).
-    # The AI-remediation deck is exempt so you can drill weak spots freely.
-    new_limit = 999 if deck_name == "Targeted follow-ups (AI)" else P["new_remaining_cap"]
+    PR0 = progress.compute(cards, states, reviews, answers)  # today's points baseline
+    cards_by_id = {c["id"]: c for c in cards}
+
+    # today's focus = topics/modules of the cards due or about to be introduced
+    focus_ids = list(P["due_ids"]) + P["unseen_ids"][:max(P["new_remaining_target"], 1)]
+    today_modules = {cards_by_id[i].get("module") for i in focus_ids if i in cards_by_id}
+    today_topics = sorted({cards_by_id[i]["topic"] for i in focus_ids if i in cards_by_id})
+
+    if deck_name == TODAY_EXAM:
+        # exam-style questions from the module(s) you're revising today (uncapped)
+        def deck_fn(c):
+            return c.get("source") == "exam" and c.get("module") in today_modules
+        new_limit = 999
+    else:
+        deck_fn = DECKS[deck_name]
+        # per-DAY new-card budget; AI-remediation & exam decks are exempt for free drilling
+        if deck_name in ("Targeted follow-ups (AI)", "Exam-style questions"):
+            new_limit = 999
+        else:
+            new_limit = P["new_remaining_cap"]
+
     now = datetime.now(timezone.utc)
     due, new = [], []
     for c in cards:
@@ -65,20 +90,23 @@ def build_queue(deck_fn, deck_name):
         elif datetime.fromisoformat(s["due"]) <= now:
             due.append(c)
     new.sort(key=lambda c: (c.get("module") or 99, str(c.get("id"))))
-    return due + new[:new_limit], states, P
+    extras = {"today_topics": today_topics, "pts_today_base": PR0["points_today"], "goal": PR0["goal"]}
+    return due + new[:new_limit], states, P, extras
 
 
 # ---------------------------------------------------------------- init / deck change
-deck_name = st.selectbox("Deck", list(DECKS.keys()))
+deck_name = st.selectbox("Deck", list(DECKS.keys()) + [TODAY_EXAM])
 RESET_KEYS = ["queue", "cards_by_id", "states", "session_id", "session_start",
-              "done", "revealed", "shown_at", "grade_result", "answer_text"]
+              "done", "revealed", "shown_at", "grade_result", "answer_text",
+              "session_points", "session_good", "pts_today_base", "goal",
+              "focus_topics", "goal_celebrated"]
 if st.session_state.get("deck_name") != deck_name:
     for k in RESET_KEYS:
         st.session_state.pop(k, None)
     st.session_state["deck_name"] = deck_name
 
 if "queue" not in st.session_state:
-    queue, states, P = build_queue(DECKS[deck_name], deck_name)
+    queue, states, P, extras = build_queue(deck_name)
     st.session_state["plan_snapshot"] = {
         "new_today_done": P["new_today_done"], "daily_new_cap": P["daily_new_cap"],
         "new_remaining_cap": P["new_remaining_cap"], "unseen": P["unseen"],
@@ -89,6 +117,12 @@ if "queue" not in st.session_state:
     st.session_state["session_id"] = db.start_session(uid, deck_name)
     st.session_state["session_start"] = time.time()
     st.session_state["done"] = 0
+    st.session_state["session_points"] = 0
+    st.session_state["session_good"] = 0
+    st.session_state["pts_today_base"] = extras["pts_today_base"]
+    st.session_state["goal"] = extras["goal"]
+    st.session_state["focus_topics"] = extras["today_topics"]
+    st.session_state.pop("goal_celebrated", None)
     st.session_state["revealed"] = False
     st.session_state["shown_at"] = time.time()
     st.session_state["grade_result"] = None
@@ -101,7 +135,9 @@ if not queue:
     mins = (time.time() - st.session_state.get("session_start", time.time())) / 60
     db.end_session(st.session_state.get("session_id"),
                    int(mins * 60_000), st.session_state.get("done", 0))
-    st.success(f"Done! {st.session_state.get('done', 0)} cards in {mins:.0f} min.")
+    st.success(f"Done! {st.session_state.get('done', 0)} answers · "
+               f"{st.session_state.get('session_good', 0)} Good/Easy · "
+               f"+{st.session_state.get('session_points', 0)} points · {mins:.0f} min.")
     st.balloons()
     # auto-refresh weak areas once per session (only if new Deep-mode answers exist)
     sid = st.session_state.get("session_id")
@@ -127,6 +163,31 @@ if not queue:
             st.session_state.pop(k, None)
         st.rerun()
     st.stop()
+
+# ---------------------------------------------------------------- progress HUD (game)
+def render_status():
+    focus = st.session_state.get("focus_topics", [])
+    if focus:
+        st.markdown("🎯 **Today's focus:** " + "  ·  ".join(focus[:4]))
+    pts_today = st.session_state["pts_today_base"] + st.session_state["session_points"]
+    goal = st.session_state.get("goal") or progress.DAILY_POINTS_GOAL
+    elapsed = time.time() - st.session_state["session_start"]
+    a, b, c, d = st.columns(4)
+    a.metric("Answered", st.session_state["done"])
+    b.metric("Good/Easy ✅", st.session_state["session_good"])
+    c.metric("Points today", pts_today)
+    d.metric("Time", f"{int(elapsed // 60)}m {int(elapsed % 60):02d}s")
+    reached = pts_today >= goal
+    st.progress(min(1.0, pts_today / goal) if goal else 0.0,
+                text=(f"🎯 Daily goal {pts_today}/{goal} pts" + ("  ✅ reached!" if reached else "")))
+    if reached and not st.session_state.get("goal_celebrated"):
+        st.session_state["goal_celebrated"] = True
+        st.balloons()
+        st.toast("🎉 Daily goal reached — nice work!")
+
+
+render_status()
+st.divider()
 
 # ---------------------------------------------------------------- current card
 card = st.session_state["cards_by_id"][queue[0]]
@@ -155,8 +216,13 @@ def render_mark_scheme(card):
                 st.markdown(f"- {item}")
 
 
-def advance():
-    st.session_state["queue"] = queue[1:]
+def advance(requeue_id=None, gap=0):
+    """Drop the current card; if requeue_id is given, re-insert it `gap` cards
+    later so a failed card comes back THIS session (Anki-style learning steps)."""
+    q = st.session_state["queue"][1:]
+    if requeue_id is not None and requeue_id not in q:
+        q.insert(min(len(q), gap), requeue_id)
+    st.session_state["queue"] = q
     st.session_state["done"] += 1
     st.session_state["revealed"] = False
     st.session_state["shown_at"] = time.time()
@@ -182,7 +248,12 @@ def grade(rating):
             st.warning(f"Answer not saved (DB write failed: {e})")
     st.session_state["states"][card["id"]] = {
         "fsrs": updated, "due": updated["due"], "reps": reps}
-    advance()
+    # gamification: rack up points; Good/Easy count as "passes"
+    st.session_state["session_points"] += progress.points_for(rating)
+    if rating >= 3:
+        st.session_state["session_good"] += 1
+    # Anki-style re-queue: Again/Hard come back this session; Good/Easy graduate
+    advance(requeue_id=card["id"], gap=REQUEUE_GAP[rating]) if rating in REQUEUE_GAP else advance()
 
 
 def grade_buttons(suggested=None):

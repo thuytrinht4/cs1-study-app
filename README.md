@@ -64,7 +64,8 @@ In the browser: create an account → log in → "Import starter deck" → **Sta
 - `cs1/progress.py` — pure scoring logic: recall points + daily goal, exam marks/AI accuracy, per-topic strength (coverage × quality × depth, where quality blends self-rated Good/Easy with the AI mark ratio), daily activity, weak-topic detection.
 - `cs1/coach.py` — shared weak-area analysis: `run_analysis` (Weak Areas page) and `maybe_autorun` (auto-refresh after each study session / mock when new Deep-mode answers exist).
 - `cs1/plan.py` — pure planning logic on top of FSRS: adaptive new-card target, coverage tracking, behind-ness, forecast.
-- `data/exam_cards.json`, `data/exam_cards_2.json` — 37 past-paper-style, multi-part exam questions (239 marks) with full model answers + mark schemes, weighted to GLMs, regression, hypothesis testing and Bayesian. Import/update from Home; study via the "Exam-style questions" deck; mark schemes also sharpen the AI marking.
+- `data/exam_cards*.json` — 54 past-paper-style, multi-part exam questions (335 marks; 14 of them CS1B R) with full model answers + mark schemes, weighted to GLMs, regression, hypothesis testing and Bayesian. Import/update from Home; study via the "Exam-style questions" deck or **"📝 Exam Qs — today's topics"** (auto-filtered to the module(s) you're revising today); mark schemes also sharpen the AI marking.
+- Study loop uses **Anki-style in-session learning steps**: a card graded *Again* reappears ~3 cards later and *Hard* ~8 later (this session), while *Good/Easy* graduate — on top of FSRS's cross-day scheduling. A gamified HUD shows today's focus, answered/Good-Easy counts, time, and a live daily points-goal bar.
 - AI question generator (`ai.generate_exam_question`) — Home button to generate a brand-new exam question on any topic on demand.
 - `schema.sql` — database tables + row-level security.
 
