@@ -47,36 +47,73 @@ states = db.get_card_states(uid)
 reviews = db.get_reviews(uid)
 P = plan.compute(profile, cards, states, reviews)
 
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Due now", P["due_today"])
-c2.metric("New today", P["new_remaining_target"],
-          help="Recommended new cards to add today to stay on track for full coverage.")
-c3.metric("Covered", f"{P['seen']}/{P['total']}")
-c4.metric("Days to CS1A", P["days_to_exam"])
+cards_by_id = {c["id"]: c for c in cards}
+today = plan.today_utc()
+days_to_b = (P["exam_b"] - today).days
 
-# plan status — the "am I on track / how behind am I" answer
+# ---- days left, front and centre
+st.markdown(f"## ⏳ {P['days_to_exam']} days to CS1A · {days_to_b} days to CS1B")
+st.caption(f"CS1A (theory) {P['exam_a']:%a %d %b %Y} · CS1B (R) {P['exam_b']:%a %d %b %Y}  ·  "
+           f"≈ {P['days_to_exam'] // 7} weeks left  ·  finish first pass by {P['coverage_target']:%d %b}")
+
+# ---- on track / behind banner
 if P["on_track"]:
-    st.success("✅ **On track.** Do today's plan and every topic is covered with three weeks "
-               "to spare before the exam.")
+    st.success("✅ **On track** — do today's plan and every topic is covered with three weeks to spare.")
 else:
     msg = []
     if P["overdue"]:
         msg.append(f"{P['overdue']} review(s) overdue")
     if P["coverage_gap"]:
-        msg.append(f"{P['coverage_gap']} card(s) behind on coverage (~{P['coverage_days_behind']}d)")
-    st.warning("⚠️ **Behind by " + str(P["behind_cards"]) + " card(s):** " + " · ".join(msg)
+        msg.append(f"{P['coverage_gap']} behind on coverage (~{P['coverage_days_behind']}d)")
+    st.warning(f"⚠️ **Behind by {P['behind_cards']} card(s):** " + " · ".join(msg)
                + ". Open the Plan for a catch-up.")
 
 st.divider()
+
+# ---- today's snapshot
+todays_reviews = [r for r in reviews if plan._as_date(r.get("reviewed_at")) == today]
+answered_today = len(todays_reviews)
+topics_today = sorted({r.get("topic") for r in todays_reviews if r.get("topic")})
+topics_total = len(P["topics"])
+topics_started = sum(1 for t in P["topics"] if t["seen"] > 0)
+topics_not_started = topics_total - topics_started
+focus_ids = list(P["due_ids"]) + P["unseen_ids"][:max(P["new_remaining_target"], 1)]
+focus_topics = sorted({cards_by_id[i]["topic"] for i in focus_ids if i in cards_by_id})
+
 st.markdown("### Today")
+if focus_topics:
+    st.markdown("**Today's focus:** " + "  ·  ".join(focus_topics))
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Due now", P["due_today"])
+m2.metric("Answered today", answered_today, help="Cards you've reviewed so far today.")
+m3.metric("New to add", P["new_remaining_target"], help="Recommended new cards to add today.")
+m4.metric("Topics not started", f"{topics_not_started}/{topics_total}",
+          help="Syllabus topics with no card seen yet.")
+if topics_today:
+    st.caption("✅ Topics done today: " + ", ".join(topics_today))
 if P["due_today"] + P["new_remaining_target"] > 0:
-    st.markdown(f"Clear **{P['due_today']} due** and add **{P['new_remaining_target']} new** "
-                f"(of {P['unseen']} still unseen).")
+    st.markdown(f"**Plan:** clear **{P['due_today']} due** + add **{P['new_remaining_target']} new**  "
+                f"·  {P['seen']}/{P['total']} cards covered, {P['unseen']} unseen.")
 else:
     st.success("Nothing required today — you're ahead. Studying more is optional.")
 pc1, pc2 = st.columns(2)
 pc1.page_link("pages/1_📚_Study.py", label="▶ Start studying", icon="📚")
-pc2.page_link("pages/4_📅_Plan.py", label="📅 See full plan to the exam", icon="📅")
+pc2.page_link("pages/4_📅_Plan.py", label="📅 Full plan & task list", icon="📅")
+
+# ---- weak points
+st.divider()
+st.markdown("### 🎯 Your weak points")
+weak = db.get_weak_patterns(uid, only_open=True)
+SEV = {3: "🔴 high", 2: "🟠 medium", 1: "🟡 low"}
+if weak:
+    for p in weak[:5]:
+        st.markdown(f"- **{p.get('label', '')}**  ·  {p.get('topic', '')}  ·  "
+                    f"{SEV.get(p.get('severity', 2), '')}")
+    st.page_link("pages/2_🎯_Weak_Areas.py", label="See all weak areas & practise them", icon="🎯")
+else:
+    st.caption("None found yet — do some Deep-mode marking or a mock, then run "
+               "Weak Areas → analysis to surface your recurring gaps.")
+    st.page_link("pages/2_🎯_Weak_Areas.py", label="Open Weak Areas", icon="🎯")
 
 # ---------------------------------------------------------------- exam practice
 st.divider()
